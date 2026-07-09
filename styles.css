@@ -1788,11 +1788,22 @@ a { text-decoration: none; color: inherit; }
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
 }
-.check-ico { display: flex; flex-shrink: 0; }
-.check-ico .material-symbols-outlined { font-size: 20px; }
-.check-ico--ok { color: var(--positive); }
-.check-ico--no { color: var(--error); }
+.check-row:hover { background: var(--slate-50); }
+.check-chev { display: flex; flex-shrink: 0; color: var(--brand); }
+.check-chev .material-symbols-outlined { font-size: 20px; transition: transform .25s ease; }
+.check-item.is-open .check-chev .material-symbols-outlined { transform: rotate(180deg); }
+.check-panel { height: 0; overflow: hidden; transition: height .25s ease; }
+.check-body { padding: 0 14px 12px; }
+.check-detail { margin: 0; font-size: 13px; line-height: 18px; color: var(--on-surface-variant); }
+@media (prefers-reduced-motion: reduce) {
+  .check-panel, .check-chev .material-symbols-outlined { transition: none; }
+}
 .check-label { flex: 1; min-width: 0; font-size: 14px; line-height: 20px; color: var(--on-surface); }
 .check-pill { flex-shrink: 0; padding: 3px 10px; border-radius: 8px; font-size: 12px; font-weight: 500; }
 .check-pill--ok { background: #b7f1b9; color: #1d5128; }

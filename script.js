@@ -1617,6 +1617,7 @@ function createReviewModal(cfg) {
     const btn = e.target.closest("[data-act]");
     if (!btn) return;
     const act = btn.getAttribute("data-act");
+    if (act === "check-toggle") { toggleCheck(btn.closest(".check-item")); return; }   // nested checklist accordion
     const itemEl = btn.closest(".acc-item");
     const id = itemEl && itemEl.dataset.rel;
     if (act === "toggle") { setExpanded(expandedId === id ? null : id); }
@@ -1642,6 +1643,22 @@ function createReviewModal(cfg) {
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !scrim.hidden) close(); });
 
   return api;
+}
+
+/* Expand / collapse a checklist row's nested panel (animated). */
+function toggleCheck(item) {
+  if (!item) return;
+  const panel = item.querySelector(".check-panel");
+  const opening = !item.classList.contains("is-open");
+  item.classList.toggle("is-open", opening);
+  if (!panel) return;
+  if (opening) {
+    panel.style.height = panel.scrollHeight + "px";
+    clearTimeout(panel._t); panel._t = setTimeout(() => { panel.style.height = "auto"; }, 280);
+  } else {
+    if (panel.style.height === "auto" || panel.style.height === "") { panel.style.height = panel.scrollHeight + "px"; void panel.offsetHeight; }
+    clearTimeout(panel._t); panel.style.height = "0px";
+  }
 }
 
 /* Animate a tonal action button: spinner → tick → callback. */
@@ -1989,15 +2006,18 @@ function animateSend(btn, tonal, cb) {
 
 /* ---------- shared checklist helpers ---------- */
 function myaChecklist(checks) {
-  // Static rows — icon + label + status chip. The chip already conveys the
-  // state, so there's no expandable panel.
+  // Each row is an expandable accordion (chevron). The status chip conveys the
+  // state; the panel holds supporting detail (placeholder content for now).
   return '<ul class="checklist">' + checks.map((c) =>
     '<li class="check-item">' +
-      '<div class="check-row">' +
-        '<span class="check-ico check-ico--' + (c.done ? "ok" : "no") + '"><span class="material-symbols-outlined">' + (c.done ? "check" : "close") + '</span></span>' +
+      '<button type="button" class="check-row" data-act="check-toggle">' +
         '<span class="check-label">' + c.label + '</span>' +
         '<span class="check-pill check-pill--' + (c.done ? "ok" : "no") + '">' + c.status + '</span>' +
-      '</div>' +
+        '<span class="check-chev"><span class="material-symbols-outlined">keyboard_arrow_down</span></span>' +
+      '</button>' +
+      '<div class="check-panel"><div class="check-body">' +
+        '<p class="check-detail">' + (c.detail || "Supporting detail for this check will appear here.") + '</p>' +
+      '</div></div>' +
     '</li>'
   ).join("") + '</ul>';
 }
