@@ -1,0 +1,497 @@
+Received: from LO0P123MB4058.GBRP123.PROD.OUTLOOK.COM (::1) by
+ CW1P123MB8036.GBRP123.PROD.OUTLOOK.COM with HTTPS; Thu, 7 May 2026 11:34:28
+ +0000
+Received: from CWLP123CA0230.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:19f::15)
+ by LO0P123MB4058.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:170::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.17; Thu, 7 May
+ 2026 11:34:26 +0000
+Received: from CW1P265MB7673.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:400:19f:cafe::71) by CWLP123CA0230.outlook.office365.com
+ (2603:10a6:400:19f::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.17 via Frontend
+ Transport; Thu, 7 May 2026 11:34:26 +0000
+Received: from CWXP265MB1400.GBRP265.PROD.OUTLOOK.COM (2603:10a6:401:42::14)
+ by CW1P265MB7673.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:21f::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.17; Thu, 7 May
+ 2026 11:34:18 +0000
+Received: from CWXP265MB1400.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::7417:77cf:2bbe:70ea]) by CWXP265MB1400.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::7417:77cf:2bbe:70ea%5]) with mapi id 15.20.9891.008; Thu, 7 May 2026
+ 11:34:18 +0000
+From: Sandra Joe-Ejim <SJoe-Ejim@setfords.co.uk>
+To: Ceri Stafford <CStafford@setfords.co.uk>, Andrew Petchey
+	<APetchey@setfords.co.uk>, Sophie Dowdall <sdowdall@setfords.co.uk>,
+	Consultants - All <Consultants-All@setfords.co.uk>
+Subject: Re: AI assistant
+Thread-Topic: AI assistant
+Thread-Index: AdzeET7TuWuQv9uaQPaiGAM4qmK/DQAAYNywAACV/rAAAAxhwQ==
+X-MS-Exchange-MessageSentRepresentingType: 1
+Date: Thu, 7 May 2026 11:34:18 +0000
+Message-ID:
+	<CWXP265MB1400A858F6390052DF2954E4D33C2@CWXP265MB1400.GBRP265.PROD.OUTLOOK.COM>
+References:
+	<LO4P123MB531898D45779947032DBCD38EC3C2@LO4P123MB5318.GBRP123.PROD.OUTLOOK.COM>
+ <LOAP123MB8718A5B73F5DB7C0D3AA1128F13C2@LOAP123MB8718.GBRP123.PROD.OUTLOOK.COM>
+ <LOYP123MB35027899BBCDECB4F3A886879A3C2@LOYP123MB3502.GBRP123.PROD.OUTLOOK.COM>
+In-Reply-To:
+	<LOYP123MB35027899BBCDECB4F3A886879A3C2@LOYP123MB3502.GBRP123.PROD.OUTLOOK.COM>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Exchange-Organization-AuthAs: Internal
+X-MS-Exchange-Organization-AuthMechanism: 04
+X-MS-Exchange-Organization-AuthSource: CWXP265MB1400.GBRP265.PROD.OUTLOOK.COM
+X-MS-Has-Attach:
+X-Auto-Response-Suppress: DR, OOF, AutoReply
+X-MS-Exchange-Organization-Network-Message-Id:
+	29cb82d5-f37b-49ee-43ef-08deac2c936c
+X-MS-Exchange-Organization-SCL: 1
+X-MS-TNEF-Correlator:
+X-MS-Exchange-Organization-RecordReviewCfmType: 0
+x-ms-publictraffictype: Email
+x-ms-reactions: allow
+x-signature365-signatureinjectedby: OutlookAddIn
+x-signature365-messageprocessed: true
+X-Microsoft-Antispam-Mailbox-Delivery:
+	ucf:1;jmr:0;auth:0;dest:C;OFR:CustomRules;ENG:(910005)(920097)(425001)(930201)(20251009189)(140003);
+X-Microsoft-Antispam-Message-Info:
+	NvJbuNcKTDbRMGb/yIXaWdImNcSD+24GZHQ7lYybvV3549X36qMEKQLNouQLxQ+YkFiX3q8ETa4jiQ6dXfJAcNkSj83eXBm159KHpggf/wTvV7vR9Ic/6VOPyxYnv266mBQXTayfX+BrkCa0WGxcpRCuZNd3yRA9EHInSNck5w9cWx8lC6rWMYzR4kfkNfuxHDGaZ+N1JTXGOoFibdI1I2L/WGCNMReFwZ7yND89YAHftPNRsvqbU3y03mnXK//twtl+Gy/s+K+hfS1mevWTLa6r9PP+s7ND67Qqcoc6ysrIY1vsJfDoHLipsMtkZubn2TnlK+0GDd7qHj0Q5BPsVwjvqKxhY0R8Y1B2YHYaHwjlD/kHH5y6eL7ze1KJRUdF1Vz+RhzUEKFrLmGHhN1fMWwmZu2Vfx6n4bYES7eR3tovcmJfW2VS59koeW3mqxE6TTfOeAJa/nYDKDsQa89Iy0fa3MTpm8kB+ssaNRUMb2V5uLP61EfOW/GgbcF2BECNvQLLQb1OHy1JLXPmMC/q9EGAewl+nYbJjnB9bH2MKtoY+7Te8ErDAFhivup/PSXeqX3iU8Wa8BHsATN5VFqkrQWJykOM5jHzr4ZR+VqRFNLLToU57xuKsgfCwI5DI/Y8rbJL9N3vgv0OVu7qk/Pr8ct+WYGXT2qWC9RtVMQaDk+F4SCUCkv8TZ0QC56fKhQgAjkXD8mX2jFZLYdGBA0E55bMrqloFA/UnHLDFG4mUxkmpz0b3hxd9AtIpau/IGG84kYdTsGX7fHMs75Z/TLWtSWJ4F4GVb1teXkNS08SHED6buj/BKwDd3YIk60i1lFlJDaM+W7tyRdaI0/1rtvfGobjA5idFMIDpzsIYVXvH1RXtK6NdhfttHALzwh6Ytwb
+Content-Type: multipart/alternative;
+	boundary="_000_CWXP265MB1400A858F6390052DF2954E4D33C2CWXP265MB1400GBRP_"
+MIME-Version: 1.0
+
+--_000_CWXP265MB1400A858F6390052DF2954E4D33C2CWXP265MB1400GBRP_
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
+
+Hi Andrew
+Would you be kind enough to loop me in as well?
+Best
+S
+
+Sandra Joe-Ejim
+Consultant Solicitor
+
+Direct: 01233 221 265 Ext: 3046
+Email: SJoe-Ejim@setfords.co.uk
+<mailto:SJoe-Ejim@setfords.co.uk>
+
+
+________________________________
+From: Ceri Stafford <CStafford@setfords.co.uk>
+Sent: Thursday, May 7, 2026 12:32:03 PM
+To: Andrew Petchey <APetchey@setfords.co.uk>; Sophie Dowdall <sdowdall@setf=
+ords.co.uk>; Consultants - All <Consultants-All@setfords.co.uk>
+Subject: RE: AI assistant
+
+
+Andrew =96 I would be interesting in pricing for Lexis + prot=E9g=E9.  I ha=
+ve a subscription to Lexis and tried the AI tool just for research and I re=
+ally liked it =96 however they never came back to me on pricing.
+
+
+
+I also like Motion for organising my calendar
+
+
+
+
+
+Ceri Stafford
+Consultant Solicitor
+
+Direct: 0238 001 3044 Ext: 2416
+Email: CStafford@setfords.co.uk
+<mailto:CStafford@setfords.co.uk>
+
+
+
+From: Andrew Petchey <APetchey@setfords.co.uk>
+Sent: 07 May 2026 12:24
+To: Sophie Dowdall <sdowdall@setfords.co.uk>; Consultants - All <Consultant=
+s-All@setfords.co.uk>
+Subject: RE: AI assistant
+
+
+
+Hi Sophie,
+
+
+
+Just before leaving my last Practice earlier in the year I implemented and =
+started using Lexis+ Protege, which was pretty super but you did have to be=
+ careful to verify results.  With that knowledge, I used it every day for r=
+esearch and some drafting.   It sped things up quite markedly.  PL also do =
+CoCounsel but having checked with IT last week, it is not part of our PL pa=
+ckage.  Therefore, I am looking to subscribe to Lexis Prot=E9g=E9 or Legora=
+, which is also really good.  I think both are good for research, analysis =
+(comparing) and drafting.  I can let you know the pricing.  I have connecti=
+ons at Lexis so hope to secure reasonable subscription terms.
+
+
+
+With kind regards,
+
+
+
+Andrew
+
+
+
+Andrew Petchey
+Chartered Legal Executive Litigator and Advocate
+
+Direct: 02080 365753 Ext: 3314
+Email: APetchey@setfords.co.uk
+<mailto:APetchey@setfords.co.uk>
+
+
+
+From: Sophie Dowdall <sdowdall@setfords.co.uk<mailto:sdowdall@setfords.co.u=
+k>>
+Sent: 07 May 2026 12:05
+To: Consultants - All <Consultants-All@setfords.co.uk<mailto:Consultants-Al=
+l@setfords.co.uk>>
+Subject: AI assistant
+
+
+
+Hi,
+
+
+
+Does anyone use an AI assistant?
+
+
+
+Kind regards
+
+
+
+Sophie Dowdall
+Consultant Solicitor
+
+Direct: 01932 901 125 Ext: 2009
+Email: sdowdall@setfords.co.uk
+<mailto:sdowdall@setfords.co.uk>
+
+
+
+--_000_CWXP265MB1400A858F6390052DF2954E4D33C2CWXP265MB1400GBRP_
+Content-Type: text/html; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DWindows-1=
+252">
+</head>
+<body>
+<div style=3D"font-family: Aptos, -apple-system, HelveticaNeue, sans-serif;=
+font-size: 12pt">
+<div style=3D"font-family: Aptos, Aptos_MSFontService, -apple-system, Robot=
+o, Arial, Helvetica, sans-serif; font-size: 12pt; color: rgb(0, 0, 0);" dir=
+=3D"ltr">
+Hi Andrew&nbsp;</div>
+<div style=3D"font-family: Aptos, Aptos_MSFontService, -apple-system, Robot=
+o, Arial, Helvetica, sans-serif; font-size: 12pt; color: rgb(0, 0, 0);" dir=
+=3D"ltr">
+Would you be kind enough to loop me in as well?</div>
+<div style=3D"font-family: Aptos, Aptos_MSFontService, -apple-system, Robot=
+o, Arial, Helvetica, sans-serif; font-size: 12pt; color: rgb(0, 0, 0);" dir=
+=3D"ltr">
+Best</div>
+<div style=3D"font-family: Aptos, Aptos_MSFontService, -apple-system, Robot=
+o, Arial, Helvetica, sans-serif; font-size: 12pt; color: rgb(0, 0, 0);" dir=
+=3D"ltr">
+S</div>
+</div>
+<div id=3D"ms-outlook-mobile-body-separator-line" style=3D"font-family: Apt=
+os, -apple-system, HelveticaNeue, sans-serif;font-size: 12pt" dir=3D"auto">
+<br>
+</div>
+<div id=3D"ms-outlook-mobile-signature" style=3D"font-family: Aptos, -apple=
+-system, HelveticaNeue, sans-serif;font-size: 12pt">
+<style type=3D"text/css">body,p,li,div{mso-style-name:signature365-sbmdmo3d=
+;mso-style-priority:99;margin:0cm;color:black}a{mso-style-name:signature365=
+-link-sbmdmo3d;mso-style-priority:99;text-decoration:underline;color:blue;}=
+</style>
+<table border=3D"0" cellspacing=3D"0" cellpadding=3D"0">
+<tbody>
+<tr>
+<td>
+<div id=3D"signature-365-signature">
+<div style=3D"color: black; font-family: Calibri, Candara, Segoe, Segoe UI,=
+ Optima, Arial, sans-serif; font-size: 11pt">
+<span style=3D"color: #000000; font-family: Calibri, Candara, Segoe, 'Segoe=
+ UI', Optima, Arial, sans-serif;"><span style=3D"color: #000000; font-famil=
+y: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;"><span s=
+tyle=3D"font-size: small;"><b><span style=3D"font-size: 13pt;">Sandra
+ Joe-Ejim<span style=3D"font-family: Calibri, Candara, Segoe, 'Segoe UI', O=
+ptima, Arial, sans-serif;"><span style=3D"font-size: xx-small; color: #0000=
+00;"><span style=3D"font-size: small;"><span style=3D"font-size: 13pt;"><sp=
+an style=3D"font-size: small; color: #000000; font-family: 'Helvetica Neue'=
+, Helvetica, Arial, sans-serif;"><span style=3D"color: #282837;"><span styl=
+e=3D"font-size: 13pt;"><span style=3D"font-size: 8pt;"></span></span></span=
+></span></span></span></span></span></span><br>
+</b><span style=3D"font-size: 12pt;">Consultant Solicitor<br>
+<span style=3D"font-size: 10pt;"></span></span><br>
+</span><span style=3D"font-size: xx-small;"><span style=3D"font-size: 11pt;=
+"><b>Direct:
+</b>01233 221 265 <b>Ext: </b>3046 <br>
+<b>Email:</b> <a style=3D"text-decoration: none; color: #000000;" href=3D"m=
+ailto:SJoe-Ejim@setfords.co.uk">
+SJoe-Ejim@setfords.co.uk<br>
+</a></span></span></span></span><span style=3D"color: #000000; font-family:=
+ Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;"><span sty=
+le=3D"font-size: xx-small;"><br>
+<span style=3D"font-size: xx-small; color: #000000;"><span style=3D"font-si=
+ze: 11pt;"><b><span style=3D"font-size: 11pt; color: #ba372a;"><span style=
+=3D"font-size: xx-small; color: #000000;"><span style=3D"font-size: 11pt;">=
+<span style=3D"font-size: 11pt; color: #ba372a;"></span></span></span></spa=
+n></b></span></span><br>
+</span></span></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div><br>
+</div>
+</div>
+<hr style=3D"display:inline-block;width:98%" tabindex=3D"-1">
+<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" st=
+yle=3D"font-size:11pt" color=3D"#000000"><b>From:</b> Ceri Stafford &lt;CSt=
+afford@setfords.co.uk&gt;<br>
+<b>Sent:</b> Thursday, May 7, 2026 12:32:03 PM<br>
+<b>To:</b> Andrew Petchey &lt;APetchey@setfords.co.uk&gt;; Sophie Dowdall &=
+lt;sdowdall@setfords.co.uk&gt;; Consultants - All &lt;Consultants-All@setfo=
+rds.co.uk&gt;<br>
+<b>Subject:</b> RE: AI assistant</font>
+<div>&nbsp;</div>
+</div>
+<style>
+<!--
+@font-face
+	{font-family:"Cambria Math"}
+@font-face
+	{font-family:Calibri}
+@font-face
+	{font-family:Aptos}
+p.x_MsoNormal, li.x_MsoNormal, div.x_MsoNormal
+	{margin:0cm;
+	font-size:11.0pt;
+	font-family:"Aptos",sans-serif}
+a:link, span.x_MsoHyperlink
+	{color:#467886;
+	text-decoration:underline}
+p.x_signature365-s7ius1ix, li.x_signature365-s7ius1ix, div.x_signature365-s=
+7ius1ix
+	{margin:0cm;
+	font-size:12.0pt;
+	font-family:"Aptos",sans-serif;
+	color:black}
+p.x_signature365-o60a10r1, li.x_signature365-o60a10r1, div.x_signature365-o=
+60a10r1
+	{margin:0cm;
+	font-size:12.0pt;
+	font-family:"Aptos",sans-serif;
+	color:black}
+span.x_EmailStyle22
+	{font-family:"Aptos",sans-serif;
+	color:windowtext}
+p.x_signature365-whz9uk0w, li.x_signature365-whz9uk0w, div.x_signature365-w=
+hz9uk0w
+	{margin:0cm;
+	font-size:12.0pt;
+	font-family:"Aptos",sans-serif;
+	color:black}
+.x_MsoChpDefault
+	{font-size:10.0pt}
+@page WordSection1
+	{margin:72.0pt 72.0pt 72.0pt 72.0pt}
+div.x_WordSection1
+	{}
+-->
+</style>
+<div lang=3D"EN-GB" link=3D"#467886" vlink=3D"#96607D" style=3D"word-wrap:b=
+reak-word">
+<div class=3D"x_WordSection1">
+<p class=3D"x_MsoNormal">Andrew =96 I would be interesting in pricing for L=
+exis + prot=E9g=E9.&nbsp; I have a subscription to Lexis and tried the AI t=
+ool just for research and I really liked it =96 however they never came bac=
+k to me on pricing.
+</p>
+<p class=3D"x_MsoNormal">&nbsp;</p>
+<p class=3D"x_MsoNormal">I also like Motion for organising my calendar </p>
+<p class=3D"x_MsoNormal">&nbsp;</p>
+<p class=3D"x_MsoNormal">&nbsp;</p>
+<div>
+<table class=3D"x_MsoNormalTable" border=3D"0" cellspacing=3D"0" cellpaddin=
+g=3D"0">
+<tbody>
+<tr>
+<td style=3D"padding:0cm 0cm 0cm 0cm">
+<div id=3D"x_signature-365-signature">
+<div>
+<p class=3D"x_signature365-whz9uk0w" style=3D"margin-bottom:12.0pt"><b><spa=
+n style=3D"font-size:13.0pt; font-family:&quot;Calibri&quot;,sans-serif">Ce=
+ri Stafford</span></b><b><span style=3D"font-family:&quot;Calibri&quot;,san=
+s-serif"><br>
+</span></b><span style=3D"font-family:&quot;Calibri&quot;,sans-serif">Consu=
+ltant Solicitor</span><span style=3D"font-family:&quot;Calibri&quot;,sans-s=
+erif"><br>
+<br>
+</span><b><span style=3D"font-size:11.0pt; font-family:&quot;Calibri&quot;,=
+sans-serif">Direct:</span></b><b><span style=3D"font-size:11.0pt; font-fami=
+ly:&quot;Calibri&quot;,sans-serif">
+</span></b><span style=3D"font-size:11.0pt; font-family:&quot;Calibri&quot;=
+,sans-serif">0238 001 3044</span><span style=3D"font-size:11.0pt; font-fami=
+ly:&quot;Calibri&quot;,sans-serif">
+</span><b><span style=3D"font-size:11.0pt; font-family:&quot;Calibri&quot;,=
+sans-serif">Ext:</span></b><b><span style=3D"font-size:11.0pt; font-family:=
+&quot;Calibri&quot;,sans-serif">
+</span></b><span style=3D"font-size:11.0pt; font-family:&quot;Calibri&quot;=
+,sans-serif">2416</span><span style=3D"font-size:11.0pt; font-family:&quot;=
+Calibri&quot;,sans-serif">
+<br>
+</span><b><span style=3D"font-size:11.0pt; font-family:&quot;Calibri&quot;,=
+sans-serif">Email:</span></b><span style=3D"font-size:11.0pt; font-family:&=
+quot;Calibri&quot;,sans-serif">
+<a href=3D"mailto:CStafford@setfords.co.uk"><span style=3D"color:black; tex=
+t-decoration:none">CStafford@setfords.co.uk</span><span style=3D"color:blac=
+k; text-decoration:none"><br>
+</span></a></span></p>
+</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class=3D"x_MsoNormal">&nbsp;</p>
+<div>
+<div style=3D"border:none; border-top:solid #E1E1E1 1.0pt; padding:3.0pt 0c=
+m 0cm 0cm; font-size:pt">
+<p class=3D"x_MsoNormal"><b><span style=3D"font-size:12.0pt; font-family:&q=
+uot;Calibri&quot;,sans-serif">From:</span></b><span style=3D"font-size:12.0=
+pt; font-family:&quot;Calibri&quot;,sans-serif"> Andrew Petchey &lt;APetche=
+y@setfords.co.uk&gt;
+<br>
+<b>Sent:</b> 07 May 2026 12:24<br>
+<b>To:</b> Sophie Dowdall &lt;sdowdall@setfords.co.uk&gt;; Consultants - Al=
+l &lt;Consultants-All@setfords.co.uk&gt;<br>
+<b>Subject:</b> RE: AI assistant</span></p>
+</div>
+</div>
+<p class=3D"x_MsoNormal">&nbsp;</p>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:12.0pt">Hi Sophie,</span>=
+</p>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:12.0pt">&nbsp;</span></p>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:12.0pt">Just before leavi=
+ng my last Practice earlier in the year I implemented and started using Lex=
+is+ Protege, which was pretty super but you did have to be careful to verif=
+y results. &nbsp;With that knowledge, I used
+ it every day for research and some drafting.&nbsp; &nbsp;It sped things up=
+ quite markedly.&nbsp; PL also do CoCounsel but having checked with IT last=
+ week, it is not part of our PL package.&nbsp; Therefore, I am looking to s=
+ubscribe to Lexis Prot=E9g=E9 or Legora, which is also really
+ good.&nbsp; I think both are good for research, analysis (comparing) and d=
+rafting.&nbsp; I can let you know the pricing.&nbsp; I have connections at =
+Lexis so hope to secure reasonable subscription terms.</span></p>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:12.0pt">&nbsp;</span></p>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:12.0pt">With kind regards=
+,</span></p>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:12.0pt">&nbsp;</span></p>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:12.0pt">Andrew</span></p>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:12.0pt">&nbsp;</span></p>
+<div>
+<table class=3D"x_MsoNormalTable" border=3D"0" cellspacing=3D"0" cellpaddin=
+g=3D"0">
+<tbody>
+<tr>
+<td style=3D"padding:0cm 0cm 0cm 0cm">
+<div id=3D"x_signature-365-signature">
+<div>
+<p class=3D"x_signature365-o60a10r1" style=3D"margin-bottom:12.0pt"><b><spa=
+n style=3D"font-size:13.0pt; font-family:&quot;Calibri&quot;,sans-serif">An=
+drew Petchey</span></b><b><span style=3D"font-family:&quot;Calibri&quot;,sa=
+ns-serif"><br>
+</span></b><span style=3D"font-family:&quot;Calibri&quot;,sans-serif">Chart=
+ered Legal Executive Litigator and Advocate<br>
+<br>
+</span><b><span style=3D"font-size:11.0pt; font-family:&quot;Calibri&quot;,=
+sans-serif">Direct:
+</span></b><span style=3D"font-size:11.0pt; font-family:&quot;Calibri&quot;=
+,sans-serif">02080 365753
+<b>Ext: </b>3314 <br>
+<b>Email:</b> <a href=3D"mailto:APetchey@setfords.co.uk"><span style=3D"col=
+or:black; text-decoration:none">APetchey@setfords.co.uk<br>
+</span></a></span></p>
+</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:12.0pt">&nbsp;</span></p>
+<div>
+<div style=3D"border:none; border-top:solid #E1E1E1 1.0pt; padding:3.0pt 0c=
+m 0cm 0cm; font-size:pt">
+<p class=3D"x_MsoNormal"><b><span style=3D"font-size:12.0pt; font-family:&q=
+uot;Calibri&quot;,sans-serif">From:</span></b><span style=3D"font-size:12.0=
+pt; font-family:&quot;Calibri&quot;,sans-serif"> Sophie Dowdall &lt;<a href=
+=3D"mailto:sdowdall@setfords.co.uk">sdowdall@setfords.co.uk</a>&gt;
+<br>
+<b>Sent:</b> 07 May 2026 12:05<br>
+<b>To:</b> Consultants - All &lt;<a href=3D"mailto:Consultants-All@setfords=
+.co.uk">Consultants-All@setfords.co.uk</a>&gt;<br>
+<b>Subject:</b> AI assistant</span></p>
+</div>
+</div>
+<p class=3D"x_MsoNormal">&nbsp;</p>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:10.0pt">Hi,</span></p>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:10.0pt">&nbsp;</span></p>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:10.0pt">Does anyone use a=
+n AI assistant?</span></p>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:10.0pt">&nbsp;</span></p>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:10.0pt">Kind regards</spa=
+n></p>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:10.0pt">&nbsp;</span></p>
+<table class=3D"x_MsoNormalTable" border=3D"0" cellspacing=3D"0" cellpaddin=
+g=3D"0">
+<tbody>
+<tr>
+<td style=3D"padding:0cm 0cm 0cm 0cm">
+<div id=3D"x_signature-365-signature">
+<div>
+<p class=3D"x_signature365-s7ius1ix" style=3D"margin-bottom:12.0pt"><b><spa=
+n style=3D"font-size:13.0pt; font-family:&quot;Calibri&quot;,sans-serif">So=
+phie Dowdall</span></b><b><span style=3D"font-family:&quot;Calibri&quot;,sa=
+ns-serif"><br>
+</span></b><span style=3D"font-family:&quot;Calibri&quot;,sans-serif">Consu=
+ltant Solicitor<br>
+<br>
+</span><b><span style=3D"font-size:11.0pt; font-family:&quot;Calibri&quot;,=
+sans-serif">Direct:
+</span></b><span style=3D"font-size:11.0pt; font-family:&quot;Calibri&quot;=
+,sans-serif">01932 901 125
+<b>Ext: </b>2009 <br>
+<b>Email:</b> <a href=3D"mailto:sdowdall@setfords.co.uk"><span style=3D"col=
+or:black; text-decoration:none">sdowdall@setfords.co.uk<br>
+</span></a></span></p>
+</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p class=3D"x_MsoNormal"><span style=3D"font-size:10.0pt">&nbsp;</span></p>
+</div>
+</div>
+</body>
+</html>
+
+--_000_CWXP265MB1400A858F6390052DF2954E4D33C2CWXP265MB1400GBRP_--
