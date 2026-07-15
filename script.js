@@ -175,7 +175,7 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
     { id: "todos",            title: "Todays to-do's"        },
     { id: "matters-close",    title: "Matters ready to close" },
     { id: "replies",          title: "Replies to send"        },
-    { id: "searches",         title: "Searches to renew"      },
+    { id: "searches",         title: "Searches to follow-up"  },
     { id: "client-relations", title: "Client relations"       },
     { id: "aml-checks",       title: "AML Checks to complete" },
     { id: "cashflow",         title: "Bills & Payments"       },
@@ -1070,13 +1070,13 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
   function relPreview(rel) {
     return (
       '<div class="relation block-item" data-open-rel="' + rel.id + '">' +
+        '<div class="bubble bubble--error">' +
+          '<p class="bubble__quote">' + rel.short + '</p>' +
+          '<div class="bubble__meta"><span>From: ' + rel.from + '</span><span>' + rel.ago + '</span></div>' +
+        '</div>' +
         '<div class="relation__chips">' +
           '<span class="chip"><span class="material-symbols-outlined">cognition</span>' + rel.chip + '</span>' +
           '<span class="confidence">Confidence <b>' + rel.confidence + '</b></span>' +
-        '</div>' +
-        '<div class="bubble bubble--error">' +
-          '<div class="bubble__meta"><span>From: ' + rel.from + '</span><span>' + rel.ago + '</span></div>' +
-          '<p class="bubble__quote">' + rel.short + '</p>' +
         '</div>' +
       '</div>'
     );
@@ -1084,13 +1084,13 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
   function positivePreview() {
     return (
       '<div class="relation">' +
+        '<div class="bubble bubble--ok">' +
+          '<p class="bubble__quote">' + POSITIVE.quote + '</p>' +
+          '<div class="bubble__meta"><span>From: ' + POSITIVE.from + '</span><span>' + POSITIVE.ago + '</span></div>' +
+        '</div>' +
         '<div class="relation__chips">' +
           '<span class="chip chip--ok"><span class="material-symbols-outlined">cognition</span>' + POSITIVE.chip + '</span>' +
           '<span class="confidence">Confidence <b>' + POSITIVE.confidence + '</b></span>' +
-        '</div>' +
-        '<div class="bubble bubble--ok">' +
-          '<div class="bubble__meta"><span>From: ' + POSITIVE.from + '</span><span>' + POSITIVE.ago + '</span></div>' +
-          '<p class="bubble__quote">' + POSITIVE.quote + '</p>' +
         '</div>' +
       '</div>'
     );
@@ -1127,13 +1127,15 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
   function accItem(rel) {
     const solo = !!focusId;
     const open = solo || expandedId === rel.id;
+    const parts = rel.header.split(" · ");
+    const ref = parts.pop();
+    const titleHtml = '<span class="acc-head__stack"><span class="acc-head__title">' + parts.join(" - ") + '</span>' +
+      '<span class="acc-head__meta">Relating to ' + ref + '</span></span>';
     // Single-item mode: static header (no toggle/chevron), body always shown.
     const head = solo
-      ? '<div class="acc-head acc-head--static">' +
-          '<span class="acc-head__title">' + rel.header + '</span>' +
-        '</div>'
+      ? '<div class="acc-head acc-head--static">' + titleHtml + '</div>'
       : '<button class="acc-head" type="button" data-act="toggle" data-rel="' + rel.id + '">' +
-          '<span class="acc-head__title">' + rel.header + '</span>' +
+          titleHtml +
           '<span class="acc-status"' + (rel.status ? "" : " hidden") + '>' + statusText(rel.status) + '</span>' +
           '<span class="acc-head__chev"><span class="material-symbols-outlined">keyboard_arrow_down</span></span>' +
         '</button>';
@@ -1382,7 +1384,7 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
 const DASH_TODO = {
   // Initial per-category counts — each matches its card's count (number of
   // items). AML has 2 checks outstanding; the 3 missing parts show in the meta.
-  totals: { replies: 9, relations: 5, matters: 7, aml: 6, searches: 2 },
+  totals: { replies: 9, relations: 5, matters: 7, aml: 6, searches: 4 },
   attended: { replies: 0, relations: 0, matters: 0, aml: 0, searches: 0 },
   sum(obj) { let n = 0; for (const k in obj) n += obj[k]; return n; },
   // Record how many of a category the user has handled, then refresh the block.
@@ -1426,7 +1428,7 @@ const DASH_TODO = {
     relations: (n) => (n === 1 ? "a relationship to nurture" : n + " relationships to nurture"),
     matters: (n) => (n === 1 ? "a matter ready to close" : n + " matters ready to close"),
     aml: (n) => (n === 1 ? "an AML check to complete" : n + " AML checks to complete"),
-    searches: (n) => (n === 1 ? "a search to renew" : n + " searches to renew"),
+    searches: (n) => (n === 1 ? "a search to follow up" : n + " searches to follow up"),
   },
   updateMyaNote() {
     const body = document.querySelector(".mya-note__body");
@@ -1609,25 +1611,29 @@ function createReviewModal(cfg) {
     scrim.hidden = false;
     requestAnimationFrame(lockHeight);
   }
-  function close() { scrim.hidden = true; }
+  // completeOnClose runs on every close path (Close button, X, scrim, Escape).
+  function close() {
+    if (cfg.completeOnClose && cfg.onComplete) cfg.onComplete();
+    scrim.hidden = true;
+  }
+  // Re-render the open modal in place (after an item's data/state changes).
+  function rerender() { render(); requestAnimationFrame(lockHeight); }
 
-  const api = { open, close, setStatus, setExpanded };
+  const api = { open, close, setStatus, setExpanded, rerender };
 
   body.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-act]");
     if (!btn) return;
     const act = btn.getAttribute("data-act");
     if (act === "check-toggle") { toggleCheck(btn.closest(".check-item")); return; }   // nested checklist accordion
+    if (act === "sd-toggle") { toggleCheck(btn.closest(".sd-card")); return; }         // search-details / certificate card
     const itemEl = btn.closest(".acc-item");
     const id = itemEl && itemEl.dataset.rel;
     if (act === "toggle") { setExpanded(expandedId === id ? null : id); }
     else { const item = cfg.items.find((i) => i.id === id); if (item && cfg.onAction) cfg.onAction(item, act, api, btn); }
   });
   scrim.querySelector(".modal__close").addEventListener("click", close);
-  scrim.querySelector('[data-mact="secondary"]').addEventListener("click", () => {
-    if (cfg.completeOnClose && cfg.onComplete) cfg.onComplete();
-    close();
-  });
+  scrim.querySelector('[data-mact="secondary"]').addEventListener("click", close);
   if (primaryBtn) primaryBtn.addEventListener("click", () => { if (cfg.onComplete) cfg.onComplete(); close(); });
   scrim.addEventListener("click", (e) => { if (e.target === scrim) close(); });
   scrim.querySelectorAll(".rate__icons").forEach((grp) => grp.addEventListener("click", (e) => {
@@ -1648,7 +1654,7 @@ function createReviewModal(cfg) {
 /* Expand / collapse a checklist row's nested panel (animated). */
 function toggleCheck(item) {
   if (!item) return;
-  const panel = item.querySelector(".check-panel");
+  const panel = item.querySelector(".check-panel, .sd-panel");
   const opening = !item.classList.contains("is-open");
   item.classList.toggle("is-open", opening);
   if (!panel) return;
@@ -1674,6 +1680,8 @@ function animateSend(btn, tonal, cb) {
 }
 
 /* ---------- Replies to send: review modal ---------- */
+// Set by repliesReviewFlow; lets Mya's search-anomaly messages queue here too.
+let addSuggestedReplies = null;
 (function repliesReviewFlow() {
   const REPLIES = [
     {
@@ -1832,12 +1840,44 @@ function animateSend(btn, tonal, cb) {
     },
   ];
 
+  // Priority order: client messages first, oldest (most days waiting) at the top;
+  // Mya's suggested messages are de-prioritised and sink to the bottom.
+  const rank = (r) => (r.suggested ? -1 : (parseInt(r.ago, 10) || 0));
+  const sortReplies = () => REPLIES.sort((a, b) => rank(b) - rank(a));
+  sortReplies();
+
   function msgCard(r) {
+    if (r.suggested) {
+      return (
+        '<div class="msg-card msg-card--suggested"><p class="msg-card__quote">' + r.reply.subject + '</p>' +
+        '<div class="msg-card__meta"><span>' + r.blockMeta + '</span>' +
+        '<span class="msg-card__tag"><span class="material-symbols-outlined">cognition</span>Suggested by Mya</span></div></div>'
+      );
+    }
     return (
-      '<div class="msg-card"><div class="msg-card__meta"><span>' + r.blockMeta + '</span><span>' + r.ago + '</span></div>' +
-      '<p class="msg-card__quote">' + r.quote + '</p></div>'
+      '<div class="msg-card"><p class="msg-card__quote">' + r.quote + '</p>' +
+      '<div class="msg-card__meta"><span>' + r.blockMeta + '</span><span>' + r.ago + '</span></div></div>'
     );
   }
+  // Queue Mya's search-anomaly suggestions into this block (once), de-prioritised.
+  addSuggestedReplies = function (msgs) {
+    let added = 0;
+    msgs.forEach((m) => {
+      const id = "reply-sug-" + m.id;
+      if (REPLIES.some((r) => r.id === id)) return;
+      REPLIES.push({
+        id: id, suggested: true, role: m.role, reason: m.reason,
+        blockMeta: "To: " + m.to, ago: "Suggested by Mya",
+        reply: { to: m.to, subject: m.subject, body: m.body.slice() }, status: null,
+      });
+      added++;
+    });
+    if (!added) return;
+    sortReplies();
+    DASH_TODO.totals.replies += added;
+    renderBlock();
+    DASH_TODO.update("replies", DASH_TODO.attended.replies);
+  };
   function renderBlock() {
     const card = document.querySelector('[data-widget-id="replies"]');
     if (!card) return;
@@ -1903,11 +1943,21 @@ function animateSend(btn, tonal, cb) {
     trigger: "open-replies",
     items: REPLIES,
     statusText: (s) => (s === "message" ? "Message Sent" : s === "draft" ? "Draft saved" : ""),
-    renderHeadMain: (item) => '<span class="acc-head__title">' + item.header + "</span>",
+    renderHeadMain: (item) => {
+      if (item.suggested) {
+        return '<span class="acc-head__stack"><span class="acc-head__title">' + item.reply.to + '</span>' +
+          '<span class="acc-head__meta">' + item.role + '</span></span>';
+      }
+      const parts = item.header.split(" · ");
+      const ref = parts.pop();
+      return '<span class="acc-head__stack"><span class="acc-head__title">' + parts.join(" - ") + '</span>' +
+        '<span class="acc-head__meta">Relating to ' + ref + '</span></span>';
+    },
     renderBody: (item) =>
-      '<p class="acc-label">What the client said</p>' +
-      '<div class="reply-said"><p class="reply-said__meta">' + item.header + '</p><p class="reply-said__quote">' + item.quote + '</p></div>' +
-      '<div class="reply-compose-head reply-compose-head--sp"><p class="reply-label">What you could say</p></div>' +
+      (item.suggested
+        ? '<p class="acc-label">Why Mya suggests this</p><div class="reply-said"><p class="reply-said__quote">' + item.reason + '</p></div>'
+        : '<p class="acc-label">What the client said</p><div class="reply-said"><p class="reply-said__meta">' + item.header + '</p><p class="reply-said__quote">' + item.quote + '</p></div>') +
+      '<div class="reply-compose-head reply-compose-head--sp"><p class="reply-label">' + (item.suggested ? "Suggested message" : "What you could say") + '</p></div>' +
       '<div class="email">' +
         '<label class="email__row"><span class="email__label">To:</span><input class="email__input js-to" type="text" value="' + escA(item.reply.to) + '"></label>' +
         '<label class="email__row"><span class="email__label">Subject:</span><input class="email__input js-subject" type="text" value="' + escA(item.reply.subject) + '"></label>' +
@@ -1915,7 +1965,7 @@ function animateSend(btn, tonal, cb) {
       '</div>' +
       '<div class="acc-actions">' +
         '<button class="btn-outline" type="button" data-act="draft">Save as draft email</button>' +
-        '<button class="btn-tonal" type="button" data-act="send">Send reply</button>' +
+        '<button class="btn-tonal" type="button" data-act="send">' + (item.suggested ? "Send message" : "Send reply") + '</button>' +
       '</div>',
     onAction: (item, act, api, btn) => {
       captureEdits(item, btn.closest(".acc-body"));
@@ -1935,19 +1985,137 @@ function animateSend(btn, tonal, cb) {
 })();
 
 /* ---------- Searches to renew: review modal ---------- */
+let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's help banner
 (function searchesReviewFlow() {
+  // Each search has a primary status chip and (optionally) a "Due" chip.
+  //   kind: error (red) · warn (orange) · ok (green, ticked) · info (blue)
+  // Only error/warn items still need follow-up, so they drive the block count.
   const SEARCHES = [
-    { id: "srch-cedar", matter: "Purchase of 14 Cedar Drive, Reading", os: "OS1", tone: "error", dateLabel: "Expired 17 June 2026", days: "2 days ago", status: null },
-    { id: "srch-bloomsbury", matter: "Purchase 8 Bloomsbury Court", os: "OS2", tone: "warn", dateLabel: "Expires 21 June 2026", days: "2 days left", status: null },
+    {
+      id: "srch-cedar", os: "OS1", ref: "P1290/2", matter: "Purchase of 14 Cedar Drive, Reading",
+      primary: { kind: "error", label: "Pending Search" }, state: "pending",
+      details: { type: "OS1", from: "12 June 2026", sentBy: "Kristine Burton", fee: "£3.00 (electronic)",
+        title: { property: "14 Cedar Drive, Pangbourne, Reading, RG8 7BH", la: "Reading", titleNo: "GR284471", proprietors: "James & Eleanor Whitfield" },
+        applicant: { name: "Thomas J. Reed", reason: "Purchase" } },
+      status: null,
+    },
+    {
+      id: "srch-bloomsbury", os: "OS2", ref: "G235/2", matter: "Purchase 8 Bloomsbury Court",
+      primary: { kind: "error", label: "Expired 4 Jun 2026" }, state: "expired",
+      details: { type: "OS2", from: "3 July 2026", sentBy: "Kristine Burton", fee: "£3.00 (electronic)",
+        title: { property: "8 Bloomsbury Court, Donnington, Telford, TF2 8DL", la: "Telford", titleNo: "SY512338", proprietors: "Margaret A. Doyle" },
+        applicant: { name: "Priya N. Sharma", reason: "Purchase" },
+        plan: "8_Bloomsbury_Crt_plan.pdf" },
+      status: null,
+    },
+    {
+      id: "srch-druid", os: "OS1", ref: "H1789/1", matter: "Purchase of 1 Druid Park Rd, Willenhall WV12 5EH",
+      primary: { kind: "warn", label: "Pending Certificate" }, state: "pending-cert",
+      details: { idNum: "156-B9-G9", savedTo: "H1789/1 - Documents", type: "OS1", from: "21 August 2026", sentBy: "Kristine Burton", fee: "£3.00 (electronic)",
+        title: { property: "1 Druid Park Road, Willenhall WV12 5EH", la: "Walsall", titleNo: "WM640219", proprietors: "Harpreet & Simran Kaur" },
+        applicant: { name: "Daniel O. Okafor", reason: "Purchase" } },
+      status: null,
+    },
+    {
+      id: "srch-oak", os: "OS1", ref: "Y86/1", matter: "Purchase of 56 Oak Tree Close, Evesham",
+      primary: { kind: "ok", label: "AP1 Ready", icon: true }, due: "25 Jul 2026", state: "ap1-ready",
+      details: { idNum: "462-C5-K7", savedTo: "Y86/1 - Documents", type: "OS1", from: "14 June 2026", sentBy: "Kristine Burton", fee: "£3.00 (electronic)",
+        title: { property: "56 Oak Tree Close, Evesham, WR11 4QT", la: "Wychavon", titleNo: "GR284471", proprietors: "Thomas J. Reed" },
+        applicant: { name: "Thomas J. Reed", reason: "Purchase" } },
+      cert: { name: "OS1R for Search 462-C5-K7", savedTo: "Y86/1 - Documents", titleNo: "GR284471", applicant: "Thomas J. Reed", priorityEnds: "25 July 2026",
+        result: "Since 14 June 2004 no adverse entries have been made." },
+      status: null,
+    },
+    {
+      id: "srch-yew1", os: "OS2", ref: "R068/1", matter: "Purchase of Yew Tree Pup, Leicester",
+      primary: { kind: "warn", label: "Anomalies found" }, due: "9 Aug 2026", state: "anomalies-found",
+      details: { idNum: "462-C5-K7", savedTo: "R068/1 - Documents", type: "OS2", from: "3 June 2026", sentBy: "Kristine Burton", fee: "£3.00 (electronic)",
+        title: { property: "Yew Tree Pub, Main Street, Leicester, LE9 2FA", la: "Blaby", titleNo: "LT428819", proprietors: "Yew Tree Holdings Ltd" },
+        applicant: { name: "Priya N. Sharma", reason: "Purchase" } },
+      cert: { name: "OS2R for Search 462-C5-K7", savedTo: "R068/1 - Documents", titleNo: "LT428819", applicant: "Priya N. Sharma", priorityEnds: "9 August 2026",
+        anomalies: [
+          "A pending application for an official search with priority (application ref. 4470115) was entered on the day list on 03 June 2026 at 11:04:12. This search confers a priority period which may rank ahead of your application.",
+          "An application to register a charge dated 04 June 2026 in favour of Example Bank plc was entered on the day list on 05 June 2026 at 14:22:07 and is pending completion.",
+        ], help: true },
+      status: null,
+    },
+    {
+      id: "srch-yew2", os: "OS1", ref: "R069/1", matter: "Purchase of Yew Tree Pup, Leicester",
+      primary: { kind: "info", label: "Anomalies Reviewed" }, due: "30 Aug 2026", state: "anomalies-reviewed",
+      details: { idNum: "462-C5-K7", savedTo: "R069/1 - Documents", type: "OS1", from: "3 June 2026", sentBy: "Kristine Burton", fee: "£3.00 (electronic)",
+        title: { property: "Yew Tree Pub, Main Street, Leicester, LE9 2FA", la: "Blaby", titleNo: "LT428820", proprietors: "Yew Tree Holdings Ltd" },
+        applicant: { name: "Priya N. Sharma", reason: "Purchase" } },
+      cert: { name: "OS1R for Search 462-C5-K7", savedTo: "R069/1 - Documents", collapsed: true },
+      status: null,
+    },
   ];
+  const needsFollowUp = (s) => s.primary.kind === "error" || s.primary.kind === "warn";
 
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  // A certificate's priority deadline runs 60 working days (weekdays) from today.
+  function workingDaysAhead(n) {
+    const d = new Date();
+    let added = 0;
+    while (added < n) { d.setDate(d.getDate() + 1); const day = d.getDay(); if (day !== 0 && day !== 6) added++; }
+    return d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear();
+  }
+  function newSearchId() {
+    const c = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789";
+    const r = (n) => Array.from({ length: n }, () => c[Math.floor(Math.random() * c.length)]).join("");
+    return r(3) + "-" + r(2) + "-" + r(2);
+  }
+  // A cert-issued search shows a deadline 60 working days out.
+  const DUE_60 = workingDaysAhead(60);
+  SEARCHES.forEach((s) => {
+    if (s.state === "ap1-ready" || s.state === "anomalies-found" || s.state === "anomalies-reviewed") s.due = DUE_60;
+  });
+  // Normalise the editable form fields (auto-populated defaults).
+  SEARCHES.forEach((s) => {
+    const d = s.details;
+    d.payment = d.payment || "direct-debit";
+    d.feeAmount = d.feeAmount || "£3.00";
+    d.propertyShown = d.propertyShown || "Edged in red";
+    d.estatePlan = !!d.estatePlan;
+    if (typeof d.firstRegistrant !== "boolean") d.firstRegistrant = !!(d.applicant && d.applicant.name === d.title.proprietors);
+  });
+  function feeLabel(d) { return d.feeAmount + " (" + (d.payment === "cheque" ? "cheque" : "electronic") + ")"; }
+
+  // Submitting a search (from Pending Search or Expired) → Pending Certificate.
+  function toPendingCert(item) {
+    item.state = "pending-cert";
+    item.primary = { kind: "warn", label: "Pending Certificate" };
+    delete item.due;
+    delete item.cert;
+    item.details.idNum = newSearchId();
+    item.details.savedTo = item.ref + " - Documents";
+  }
+  // Using one of Mya's actions on an anomalies certificate → Anomalies Reviewed.
+  function toReviewed(item) {
+    if (item.state !== "anomalies-found") return false;
+    item.state = "anomalies-reviewed";
+    item.primary = { kind: "info", label: "Anomalies Reviewed" };
+    if (item.cert) {
+      item.cert.collapsed = true;
+      delete item.cert.anomalies;
+      delete item.cert.help;
+      item.cert.result = "Anomalies reviewed — follow-up actioned with the relevant parties.";
+    }
+    return true;
+  }
+
+  function statChip(st) {
+    const ico = st.icon ? '<span class="material-symbols-outlined">check</span>' : "";
+    return '<span class="search-stat search-stat--' + st.kind + '">' + ico + st.label + '</span>';
+  }
+  function dueChip(due) { return due ? '<span class="search-stat search-stat--warn">Due ' + due + '</span>' : ""; }
+  function chips(s) {
+    return (s.os ? '<span class="search-os">' + s.os + '</span>' : "") + statChip(s.primary) + dueChip(s.due);
+  }
   function searchRow(s) {
     return (
-      '<li class="search-row block-item" data-open="open-searches" data-item-id="' + s.id + '"><div class="search-row__main">' +
-        '<div class="search-row__top"><span class="date-pill date-pill--' + s.tone + '">' + s.dateLabel + '</span>' +
-          '<span class="search-row__days search-row__days--' + s.tone + '">' + s.days + '</span></div>' +
-        '<p class="search-row__name">' + s.matter + '</p>' +
-      '</div><span class="os-badge">' + s.os + '</span></li>'
+      '<li class="search-row block-item" data-open="open-searches" data-item-id="' + s.id + '">' +
+        '<div class="search-item"><div class="search-item__chips">' + chips(s) + '</div>' +
+        '<p class="search-item__ref">' + s.ref + ' - ' + s.matter + '</p></div></li>'
     );
   }
   function renderBlock() {
@@ -1957,51 +2125,396 @@ function animateSend(btn, tonal, cb) {
     const scroll = card.querySelector(".card__scroll");
     const foot = card.querySelector(".w-foot");
     const count = card.querySelector(".w-head .w-count");
-    if (count) count.textContent = remaining.length;
+    const active = remaining.filter(needsFollowUp).length;
+    if (count) count.textContent = active;
     if (scroll) {
       scroll.innerHTML =
-        (remaining.length ? '<ul class="search-list">' + remaining.map(searchRow).join("") + "</ul>" : '<p class="empty-note">All searches renewed.</p>');
+        (remaining.length ? '<ul class="search-list">' + remaining.map(searchRow).join("") + "</ul>" : '<p class="empty-note">All searches followed up.</p>');
     }
     if (foot) {
       if (!remaining.length) { foot.style.display = "none"; }
       else { foot.style.display = ""; foot.innerHTML = '<button class="btn-tonal" type="button" data-action="open-searches">Review</button>'; }
     }
+    // Keep the to-do count in step with the live follow-up count.
+    DASH_TODO.update("searches", Math.max(0, DASH_TODO.totals.searches - active));
   }
-  function field(ph, full) { return '<input class="renew-input' + (full ? " renew-input--full" : "") + '" type="text" placeholder="' + ph + '">'; }
+  /* ----- search-details renderers (nested accordion content) ----- */
+  function kv(l, v) { return '<div class="sd-kv"><p class="sd-kv__l">' + l + '</p><p class="sd-kv__v">' + v + '</p></div>'; }
+  function detailBoxes(d) {
+    return '<div class="sd-sec">' +
+        '<p class="sd-sec__head"><span class="material-symbols-outlined">assignment</span>Search Details</p>' +
+        '<div class="sd-grid">' + kv("Search type", d.type) + kv("Search From", d.from) + kv("Sent by", d.sentBy) + kv("Fee &amp; Payment Method", feeLabel(d)) + '</div>' +
+      '</div>' +
+      '<div class="sd-cells">' +
+        '<div class="sd-cell">' +
+          '<p class="sd-sec__head"><span class="material-symbols-outlined">cottage</span>Title</p>' +
+          '<div class="sd-cell__body">' + kv("Property", d.title.property) +
+            '<div class="sd-kv-row">' + kv("Local Authority", d.title.la) + kv("Title Number", d.title.titleNo) + '</div>' +
+            kv("Proprietor(s)", d.title.proprietors) + '</div>' +
+        '</div>' +
+        '<div class="sd-cell">' +
+          '<p class="sd-sec__head"><span class="material-symbols-outlined">sentiment_calm</span>Applicant</p>' +
+          '<div class="sd-cell__body">' + kv("Applicant", d.applicant.name) + kv("Reason for search", d.applicant.reason) + '</div>' +
+        '</div>' +
+      '</div>' +
+      (d.plan ? '<div class="sd-sec sd-sec--plan"><p class="sd-heading">Plan Details</p>' +
+        '<div class="sd-plan"><p class="sd-note">' + (d.payment === "cheque"
+          ? "No plan currently exists. A referenced plan (not attached) shows the property, edged in red."
+          : "No plan currently exists. Supporting attached plan shows property, edged in red") + '</p>' +
+        (d.payment === "cheque" ? "" : '<div class="sd-file"><span class="sd-file__ico material-symbols-outlined">picture_as_pdf</span>' + d.plan + '</div>') +
+        '</div></div>' : "");
+  }
+  function sdFooter(item) {
+    const st = item.state;
+    if (st === "pending" || st === "expired") {
+      // Paying by cheque means posting the application, so it's a single
+      // download-to-submit action rather than download + electronic submit.
+      if (item.details.payment === "cheque") {
+        return '<button class="btn-filled" type="button" data-act="submit-search">Download to Submit</button>';
+      }
+      return '<a class="sd-link" href="#">Download as .docx</a>' +
+        '<button class="btn-filled" type="button" data-act="submit-search">Submit search</button>';
+    }
+    if (st === "pending-cert") {
+      return '<a class="sd-link" href="#">Download as .docx</a>';
+    }
+    return '<button class="sd-danger" type="button" data-act="withdraw">Withdraw Search</button>' +
+      '<a class="sd-link" href="#">Download as .docx</a>' +
+      '<button class="btn-outline" type="button" data-act="submit-search">Submit new search</button>';
+  }
+  function sdCard(item) {
+    const editable = item.state === "pending" || item.state === "expired";
+    const open = editable || item.state === "pending-cert";
+    const idHtml = '<b>ID:</b> ' + (editable ? "Created once submitted" : item.details.idNum);
+    const right = editable
+      ? '<span class="sd-edit" data-act="edit-details"><span class="material-symbols-outlined">edit</span></span>'
+      : '<span class="sd-saved">Saved to <span class="material-symbols-outlined">folder_open</span>' + item.details.savedTo + '</span>';
+    return '<div class="sd-card' + (open ? " is-open" : "") + '">' +
+      '<button class="sd-head" type="button" data-act="sd-toggle">' +
+        '<span class="search-os">' + item.os + '</span>' +
+        '<span class="sd-id">' + idHtml + '</span>' + right +
+        '<span class="sd-chev"><span class="material-symbols-outlined">keyboard_arrow_down</span></span>' +
+      '</button>' +
+      '<div class="sd-panel"><div class="sd-detail">' + detailBoxes(item.details) + '</div>' +
+        // The action row lives inside the card only on the "What was submitted"
+        // card (submitted states); the "What to submit" card's buttons sit below.
+        (editable ? '' : '<div class="sd-foot">' + sdFooter(item) + '</div>') + '</div></div>';
+  }
+  function myaHelp() {
+    return '<div class="sd-help">' +
+      '<span class="sd-help__ico"><span class="material-symbols-outlined">cognition</span></span>' +
+      '<span class="sd-help__txt">Mya’s here to help<span class="sd-help__sub">Check-in with HMLR and key contacts</span></span>' +
+      '<span class="sd-help__actions">' +
+        '<button class="sd-help__link" type="button" data-act="visit-hmlr">' +
+          '<span class="material-symbols-outlined">arrow_outward</span>Visit HMLR</button>' +
+        '<button class="btn-tonal" type="button" data-act="message-contacts">Message Contacts</button>' +
+      '</span></div>';
+  }
+  function certCard(item) {
+    const c = item.cert, open = !c.collapsed;
+    let body = '<p class="sd-sec__head"><span class="material-symbols-outlined">summarize</span>Summary of particulars of Search as supplied</p>' +
+      '<div class="sd-grid">' + kv("Title Number", c.titleNo) + kv("Applicant", c.applicant) + kv("Priority Period ends on", c.priorityEnds) + '</div>';
+    if (c.anomalies) {
+      body += '<div class="sd-kv"><p class="sd-kv__l">Result</p><p class="sd-result">Since the search from date shown above, the following adverse entries have been made in the register or the day list of the above title:</p>' +
+        '<ol class="sd-anoms">' + c.anomalies.map((a) => '<li>' + a + '</li>').join("") + '</ol></div>';
+    } else {
+      body += '<div class="sd-kv"><p class="sd-kv__l">Result</p><p class="sd-kv__v">' + c.result + '</p></div>';
+    }
+    // Mya's recommendation is a full-width footer bar of the certificate card.
+    const helpBar = (c.anomalies && c.help) ? myaHelp() : "";
+    return '<p class="sd-cert-label">Your certificate from HMLR</p>' +
+      '<div class="sd-card sd-card--pdf' + (open ? " is-open" : "") + '">' +
+        '<button class="sd-head" type="button" data-act="sd-toggle">' +
+          '<span class="sd-pdf material-symbols-outlined">picture_as_pdf</span>' +
+          '<span class="sd-id">' + c.name + '</span>' +
+          '<span class="sd-saved">Saved to <span class="material-symbols-outlined">folder_open</span>' + c.savedTo + '</span>' +
+          '<span class="sd-chev"><span class="material-symbols-outlined">keyboard_arrow_down</span></span>' +
+        '</button>' +
+        '<div class="sd-panel"><div class="sd-body sd-section">' + body + '</div>' + helpBar + '</div></div>';
+  }
+
+  /* ----- Edit-details form (opened from the card's edit pencil) ----- */
+  function ffText(label, value, field, opts) {
+    opts = opts || {};
+    const icon = opts.icon ? '<span class="ff__trail material-symbols-outlined">' + opts.icon + '</span>' : "";
+    return '<label class="ff' + (opts.full ? " ff--full" : "") + (opts.icon ? " ff--trail" : "") + (opts.disabled ? " is-disabled" : "") + '">' +
+      '<span class="ff__label">' + label + '</span>' +
+      '<input class="ff__input" type="text" data-field="' + field + '" value="' + escA(value || "") + '"' + (opts.disabled ? " disabled" : "") + '>' + icon + '</label>';
+  }
+  function ffSelect(label, value, options, field) {
+    return '<label class="ff"><span class="ff__label">' + label + '</span>' +
+      '<select class="ff__input" data-field="' + field + '">' +
+        options.map((o) => '<option' + (o === value ? " selected" : "") + '>' + o + '</option>').join("") +
+      '</select><span class="ff__chev material-symbols-outlined">keyboard_arrow_down</span></label>';
+  }
+  function ffRadios(name, value, options) {
+    return '<div class="ff-radios" data-radio="' + name + '">' +
+      options.map((o) => '<label class="ff-radio"><input type="radio" name="ff-' + name + '" value="' + o.v + '"' + (o.v === value ? " checked" : "") + '><span>' + o.t + '</span></label>').join("") + '</div>';
+  }
+  function fileArea(fileName) {
+    if (fileName) {
+      return '<div class="form-file"><span class="form-file__ico material-symbols-outlined">picture_as_pdf</span>' +
+        '<span class="form-file__name">' + fileName + '</span><span class="form-file__size">120 KB</span>' +
+        '<button class="form-file__x" type="button" data-file="remove"><span class="material-symbols-outlined">close</span></button></div>';
+    }
+    return '<div class="form-drop"><span class="form-drop__hint">Drag and drop your files</span>' +
+      '<span class="form-drop__or">or</span><button class="btn-filled" type="button" data-file="browse">Browse</button></div>';
+  }
+  function buildForm(item) {
+    const d = item.details, os2 = item.os === "OS2";
+    const typeOpts = ["OS1 - search of whole", "OS2 - search of part"];
+    const typeVal = os2 ? "OS2 - search of part" : "OS1 - search of whole";
+    let h = '<p class="form-intro">These details have been automatically filled in by Mya based on the matter ' + item.ref + ', but can be freely edited based on your requirements.</p>';
+    h += '<p class="form-heading">Search details</p>' +
+      '<div class="form-row">' + ffSelect("Type of search*", typeVal, typeOpts, "type") + ffText("Search from*", d.from, "from", { icon: "calendar_month" }) + '</div>' +
+      ffSelect("Sent by*", d.sentBy, [d.sentBy, "Kristine Burton", "Other fee earner"], "sentBy");
+    h += '<p class="form-heading">Fee Payment Method*</p>' +
+      ffRadios("payment", d.payment, [{ v: "cheque", t: "Cheque" }, { v: "direct-debit", t: "Direct Debit" }]) +
+      '<div class="form-warn" data-warn="cheque"' + (d.payment === "cheque" ? "" : " hidden") + '>' +
+        '<span class="material-symbols-outlined">info</span>You can only pay by cheque when submitting applications by post. This will slow your application down by a few working days versus a same-day result.</div>';
+    h += '<p class="form-heading">Property Details</p>' +
+      ffText("Address*", d.title.property, "property", { full: true }) +
+      '<div class="form-row">' + ffText("Local Authority*", d.title.la, "la") + ffText("Title Number*", d.title.titleNo, "titleNo") + '</div>' +
+      ffText("Registered Proprietor(s) or First Registrant Applicant(s)", d.title.proprietors, "proprietors", { full: true });
+    if (os2) {
+      h += '<p class="form-q">Does the Property have an approved estate plan?</p>' +
+        ffRadios("estatePlan", d.estatePlan ? "yes" : "no", [{ v: "yes", t: "Yes" }, { v: "no", t: "No" }]) +
+        '<div data-plan="no"' + (d.estatePlan ? " hidden" : "") + '>' +
+          '<p class="form-sublabel">Attached site/title plan</p><div class="form-file-slot">' + fileArea(d.plan) + '</div>' +
+          ffText("The property is shown*", d.propertyShown, "propertyShown", { full: true }) + '</div>' +
+        '<div class="form-row" data-plan="yes"' + (d.estatePlan ? "" : " hidden") + '>' +
+          ffText("Date of plan approval*", d.planApprovalDate || "", "planApprovalDate", { icon: "calendar_month" }) + ffText("Plot Number(s)*", d.plotNumbers || "", "plotNumbers") + '</div>';
+    }
+    h += '<p class="form-heading">Applicant Details</p>' +
+      '<p class="form-q">Is the Proprietor the first registrant and, therefore, the applicant?*</p>' +
+      ffRadios("firstReg", d.firstRegistrant ? "yes" : "no", [{ v: "yes", t: "Yes" }, { v: "no", t: "No" }]) +
+      ffText("Applicant Name", d.firstRegistrant ? d.title.proprietors : (d.applicant.name || ""), "applicantName", { full: true, disabled: d.firstRegistrant });
+    h += '<p class="form-heading">Reason for Search</p>' +
+      ffRadios("reason", d.applicant.reason || "Purchase", [{ v: "Purchase", t: "Purchase" }, { v: "Take a lease", t: "Take a lease" }, { v: "Take a registered charge", t: "Take a registered charge" }]);
+    return h;
+  }
+  function openSearchForm(item, onSaved) {
+    const d = item.details;
+    let planFile = d.plan || null;   // working copy of the attachment
+    const scrim = document.createElement("div");
+    scrim.className = "modal-scrim";
+    scrim.innerHTML =
+      '<div class="modal modal--form" role="dialog" aria-modal="true">' +
+        '<header class="modal__head"><h2 class="modal__title">Search application details for ' + item.ref + '</h2>' +
+          '<button class="modal__close" type="button" data-form="cancel" aria-label="Close"><span class="material-symbols-outlined">close</span></button></header>' +
+        '<div class="modal__body form-body">' + buildForm(item) + '</div>' +
+        '<footer class="modal__foot form-foot">' +
+          '<span class="form-fee">Application Fee: <b>' + d.feeAmount + '</b><br><span class="form-fee__sub">Payable using office funds</span></span>' +
+          '<div class="modal__actions"><button class="btn-outline" type="button" data-form="cancel">Cancel</button>' +
+          '<button class="btn-filled" type="button" data-form="save">Save</button></div>' +
+        '</footer></div>';
+    document.body.appendChild(scrim);
+    const bodyEl = scrim.querySelector(".form-body");
+    const getRadio = (name) => { const el = bodyEl.querySelector('[data-radio="' + name + '"] input:checked'); return el ? el.value : null; };
+    const field = (f) => bodyEl.querySelector('[data-field="' + f + '"]');
+
+    function close() { scrim.remove(); }
+    scrim.addEventListener("click", (e) => { if (e.target === scrim) close(); });
+    scrim.querySelectorAll('[data-form="cancel"]').forEach((b) => b.addEventListener("click", close));
+
+    bodyEl.addEventListener("change", (e) => {
+      const radio = e.target.closest(".ff-radio input");
+      if (!radio) return;
+      const name = radio.closest("[data-radio]").getAttribute("data-radio");
+      if (name === "payment") {
+        const warn = bodyEl.querySelector('[data-warn="cheque"]');
+        if (warn) warn.hidden = radio.value !== "cheque";
+      } else if (name === "estatePlan") {
+        bodyEl.querySelector('[data-plan="no"]').hidden = radio.value === "yes";
+        bodyEl.querySelector('[data-plan="yes"]').hidden = radio.value !== "yes";
+      } else if (name === "firstReg") {
+        const appl = field("applicantName");
+        if (radio.value === "yes") { appl.value = (field("proprietors") || {}).value || d.title.proprietors; appl.disabled = true; appl.closest(".ff").classList.add("is-disabled"); }
+        else { appl.disabled = false; appl.closest(".ff").classList.remove("is-disabled"); }
+      }
+    });
+    bodyEl.addEventListener("click", (e) => {
+      const fileBtn = e.target.closest("[data-file]");
+      if (!fileBtn) return;
+      const slot = bodyEl.querySelector(".form-file-slot");
+      if (fileBtn.getAttribute("data-file") === "browse") { planFile = "site-plan.pdf"; slot.innerHTML = fileArea(planFile); }
+      else if (fileBtn.getAttribute("data-file") === "remove") { planFile = null; slot.innerHTML = fileArea(null); }
+    });
+
+    scrim.querySelector('[data-form="save"]').addEventListener("click", () => {
+      const val = (f) => { const el = field(f); return el ? el.value.trim() : ""; };
+      d.type = item.os;   // card shows the short code
+      d.from = val("from");
+      d.sentBy = val("sentBy");
+      d.payment = getRadio("payment") || "direct-debit";
+      d.title.property = val("property");
+      d.title.la = val("la");
+      d.title.titleNo = val("titleNo");
+      d.title.proprietors = val("proprietors");
+      d.firstRegistrant = getRadio("firstReg") === "yes";
+      d.applicant.name = d.firstRegistrant ? d.title.proprietors : val("applicantName");
+      d.applicant.reason = getRadio("reason") || "Purchase";
+      if (item.os === "OS2") {
+        d.estatePlan = getRadio("estatePlan") === "yes";
+        if (d.estatePlan) { d.planApprovalDate = val("planApprovalDate"); d.plotNumbers = val("plotNumbers"); delete d.plan; }
+        else { d.propertyShown = val("propertyShown"); if (planFile) d.plan = planFile; else delete d.plan; }
+      }
+      close();
+      if (onSaved) onSaved();
+    });
+  }
 
   createReviewModal({
-    title: "Renew search",
-    subtitle: "OS1 / OS2 application",
-    intro: "Submitting lodges a fresh application with HM Land Registry and updates the expiry date on the matter.",
+    title: "Searches to follow up",
+    intro: "Submitting OS1/OS2 applications lodges a new instance with HM Land Registry and updates the expiry date of on a matter.",
     secondaryLabel: "Close",
     completeOnClose: true,
     trigger: "open-searches",
     items: SEARCHES,
-    statusText: (s) => (s ? "Submitted" : ""),
-    renderHeadMain: (item) =>
-      '<span class="acc-head__stack"><span class="acc-head__title">' + item.matter + '</span>' +
-        '<span class="acc-head__sub"><span class="date-pill date-pill--' + item.tone + '">' + item.dateLabel + '</span>' +
-          '<span class="search-row__days search-row__days--' + item.tone + '">' + item.days + '</span></span></span>',
-    renderBody: (item) =>
-      '<p class="acc-label">What you need to renew</p>' +
-      '<div class="renew-head"><span class="os-badge">' + item.os + '</span><span class="renew-head__desc">Priority search renewal — HM Land Registry</span></div>' +
-      '<div class="renew-form">' +
-        field("Matter", true) + field("Title Number") + field("Search Type") +
-        field("Property", true) + field("Applicant") + field("Priority Period") +
-      '</div>' +
-      '<div class="acc-actions"><button class="btn-tonal" type="button" data-act="submit">Submit</button></div>',
+    statusText: (s) => (s === "created" ? "AP1 Created" : s === "submitted" ? "Submitted" : s === "withdrawn" ? "Withdrawn" : ""),
+    renderAside: (item) => {
+      if (item.status === "created") return '<span class="acc-status">AP1 Created</span>';
+      if (item.status === "submitted") return '<span class="acc-status">Submitted</span>';
+      if (item.status === "withdrawn") return '<span class="acc-status">Withdrawn</span>';
+      return '<span class="acc-head__chips">' + statChip(item.primary) + dueChip(item.due) + '</span>';
+    },
+    renderHeadMain: (item) => '<span class="acc-head__title">' + item.ref + ' - ' + item.matter + '</span>',
+    renderBody: (item) => {
+      const st = item.state;
+      const label = st === "pending" ? "What to submit"
+        : st === "expired" ? 'What to submit <span class="sd-sub">(Based on your previous search)</span>'
+        : "What was submitted";
+      let h = '<p class="acc-label">' + label + '</p>' + sdCard(item);
+      // "What to submit" card (pending/expired) — buttons sit below the card.
+      if (st === "pending" || st === "expired") {
+        h += '<div class="sd-actions">' + sdFooter(item) + '</div>';
+      }
+      // Certificate from HMLR — its own card, with the buttons below it.
+      if (item.cert) {
+        h += certCard(item) +
+          '<div class="sd-actions"><a class="sd-link" href="#">Download as .pdf</a>' +
+          '<button class="btn-filled" type="button" data-act="create-ap1">Create AP1</button></div>';
+      }
+      return h;
+    },
     onAction: (item, act, api, btn) => {
-      if (act === "submit") animateSend(btn, true, () => api.setStatus(item.id, "submitted"));
+      if (act === "edit-details") {
+        openSearchForm(item, () => { api.rerender(); renderBlock(); });
+      } else if (act === "submit-search") {
+        // Submitting a search always lands on Pending Certificate.
+        animateSend(btn, false, () => { toPendingCert(item); api.rerender(); renderBlock(); });
+      } else if (act === "create-ap1") {
+        animateSend(btn, false, () => api.setStatus(item.id, "created"));
+      } else if (act === "withdraw") {
+        api.setStatus(item.id, "withdrawn");
+      } else if (act === "visit-hmlr") {
+        // Opening the HMLR portal alone does NOT mark the anomalies reviewed.
+        window.open("https://search-property-information.service.gov.uk/", "_blank", "noopener");
+      } else if (act === "message-contacts") {
+        // Reviewing the messages (closing that modal) is what marks it reviewed.
+        if (searchMessagesApi) searchMessagesApi.open(() => { if (toReviewed(item)) { api.rerender(); renderBlock(); } });
+      }
     },
-    onComplete: () => {
-      const attended = SEARCHES.filter((s) => s.status).length;
-      if (!attended) return;
-      renderBlock();
-      DASH_TODO.update("searches", attended);
-    },
+    onComplete: () => { renderBlock(); },
   });
 
   renderBlock();
+})();
+
+/* ---------- Search anomalies: "Review messages to send" modal ----------
+   Opened from the "Message Contacts" button in Mya's help banner. Drafts one
+   message per party the result flags — matter client, the other side's
+   solicitor, the client's lender and HM Land Registry — each keyed to the
+   specific adverse entry in the certificate's Result text. */
+(function searchMessagesFlow() {
+  const MESSAGES = [
+    {
+      id: "sm-client", to: "Priya N. Sharma", role: "Matter client",
+      reason: "The priority-search certificate came back with two adverse entries. Your client should be told what they mean and that you're already acting on them.",
+      subject: "Update on your search results — 8 Bloomsbury Court",
+      body: [
+        "Dear Priya,",
+        "Our priority search at HM Land Registry has come back with two entries I want to make you aware of: another party has an official search with priority pending, and a charge in favour of a lender has been lodged on the day list.",
+        "Neither is unusual at this stage and I'm following both up directly with the parties involved. I'll confirm as soon as each is resolved — there's nothing you need to do right now.",
+      ],
+      status: null,
+    },
+    {
+      id: "sm-solicitor", to: "Acting solicitor — application ref. 4470115", role: "Other party's solicitor",
+      reason: "A pending official search with priority (ref. 4470115) may rank ahead of our application. Confirm the other side's intentions and expected completion.",
+      subject: "Priority search ref. 4470115 — Title SY512338",
+      body: [
+        "Dear Colleague,",
+        "The day list for title SY512338 shows an official search with priority under application reference 4470115, entered on 03 June 2026, which appears to rank ahead of our client's application.",
+        "Please could you confirm the transaction it protects and your anticipated completion date, so we can align priority periods and avoid our respective applications cancelling each other out.",
+      ],
+      status: null,
+    },
+    {
+      id: "sm-lender", to: "Example Bank plc — Completions Team", role: "Client's lender",
+      reason: "A charge dated 04 June 2026 in your favour is pending completion on the day list. Confirm status so it doesn't hold up registration.",
+      subject: "Pending charge — Title SY512338, 8 Bloomsbury Court",
+      body: [
+        "Dear Sir/Madam,",
+        "The day list for title SY512338 shows an application to register a charge dated 04 June 2026 in your favour, entered on 05 June 2026 and pending completion.",
+        "Please confirm the current status of that application and whether any further information is required from us, so it doesn't delay registration of our client's interest.",
+      ],
+      status: null,
+    },
+    {
+      id: "sm-hmlr", to: "HM Land Registry", role: "HMLR",
+      reason: "Query the two day-list entries directly with HMLR if the other parties don't respond, to establish priority and timing.",
+      subject: "Day list query — Title SY512338",
+      body: [
+        "Dear HM Land Registry,",
+        "We act on a purchase of the property registered under title SY512338. Our official search reveals a pending priority search (ref. 4470115) and a pending charge application dated 04 June 2026.",
+        "Please could you confirm the current status and priority order of these day-list entries so we can advise our client accordingly.",
+      ],
+      status: null,
+    },
+  ];
+
+  let onReviewedCb = null, sentThisSession = false;
+  const messagesModal = createReviewModal({
+    title: "Review messages to send",
+    headNote: "Created by Mya",
+    secondaryLabel: "Close",
+    completeOnClose: true,
+    // Only mark the search reviewed if a message was actually sent this session.
+    onComplete: () => { const cb = onReviewedCb; onReviewedCb = null; if (cb && sentThisSession) cb(); },
+    trigger: "open-search-messages",
+    items: MESSAGES,
+    statusText: (s) => (s === "message" ? "Message Sent" : s === "draft" ? "Draft saved" : ""),
+    renderHeadMain: (m) => '<span class="acc-head__stack"><span class="acc-head__title">' + m.to + '</span><span class="acc-head__meta">' + m.role + '</span></span>',
+    renderBody: (m) =>
+      '<p class="acc-label">Why Mya suggests this</p>' +
+      '<div class="reply-said"><p class="reply-said__quote">' + m.reason + '</p></div>' +
+      '<div class="reply-compose-head reply-compose-head--sp"><p class="reply-label">Suggested message</p></div>' +
+      '<div class="email">' +
+        '<label class="email__row"><span class="email__label">To:</span><input class="email__input" type="text" value="' + escA(m.to) + '"></label>' +
+        '<label class="email__row"><span class="email__label">Subject:</span><input class="email__input" type="text" value="' + escA(m.subject) + '"></label>' +
+        '<textarea class="email__textarea" rows="6">' + escH(m.body.join("\n\n")) + '</textarea>' +
+      '</div>' +
+      '<div class="acc-actions">' +
+        '<button class="btn-outline" type="button" data-act="draft">Save as draft email</button>' +
+        '<button class="btn-tonal" type="button" data-act="send">Send message</button>' +
+      '</div>',
+    onAction: (m, act, api, btn) => {
+      if (act === "send") animateSend(btn, true, () => { api.setStatus(m.id, "message"); sentThisSession = true; });
+      else if (act === "draft") api.setStatus(m.id, "draft");
+    },
+  });
+
+  // Opening the suggestions also queues them into the Replies to send block.
+  // onReviewed fires on close, but only if a message was sent this session.
+  searchMessagesApi = {
+    open: (onReviewed) => {
+      onReviewedCb = onReviewed || null;
+      sentThisSession = false;
+      if (addSuggestedReplies) addSuggestedReplies(MESSAGES);
+      messagesModal.open();
+    },
+  };
 })();
 
 /* ---------- shared checklist helpers ---------- */
@@ -2042,7 +2555,7 @@ function myaProgress(pct) {
         { label: "Client account balance cleared", done: false, status: "Outstanding" },
         { label: "Residual balance cleared", done: true, status: "Completed" },
       ],
-      card: '<div class="mini-card"><p class="mini-card__title">Sale of 32 The Maltings, Tewkesbury A1264/2</p>' +
+      card: '<div class="mini-card"><div class="mini-card__head"><p class="mini-card__ref">A1264/2</p><p class="mini-card__title">Sale of 32 The Maltings, Tewkesbury</p></div>' +
         '<div class="progress-row"><div class="progress-row__left"><span class="progress-label">Progress</span>' +
         '<div class="progress-track progress-track--sm"><div class="progress-fill progress-fill--warn" style="width:80%"></div></div>' +
         '<span class="progress-pct">80%</span></div><span class="pill pill--error">£180.00 to clear</span></div></div>',
@@ -2060,7 +2573,7 @@ function myaProgress(pct) {
         { label: "Client account balance cleared", done: true, status: "Completed" },
         { label: "Residual balance cleared", done: true, status: "Completed" },
       ],
-      card: '<div class="mini-card"><p class="mini-card__title">Purchase of 14 Cedar Drive, Reading · B3320/7</p>' +
+      card: '<div class="mini-card"><div class="mini-card__head"><p class="mini-card__ref">B3320/7</p><p class="mini-card__title">Purchase of 14 Cedar Drive, Reading</p></div>' +
         '<div class="progress-row"><div class="progress-row__left"><span class="progress-label">Progress</span>' +
         '<div class="progress-track progress-track--sm"><div class="progress-fill progress-fill--ok" style="width:100%"></div></div>' +
         '<span class="progress-pct">100%</span></div><span class="pill pill--ok">No Balance</span></div></div>',
@@ -2078,7 +2591,7 @@ function myaProgress(pct) {
         { label: "Client account balance cleared", done: true, status: "Completed" },
         { label: "Residual balance cleared", done: true, status: "Completed" },
       ],
-      card: '<div class="mini-card"><p class="mini-card__title">Sale of Oakford Barn, Chipping · H2201/3</p>' +
+      card: '<div class="mini-card"><div class="mini-card__head"><p class="mini-card__ref">H2201/3</p><p class="mini-card__title">Sale of Oakford Barn, Chipping</p></div>' +
         '<div class="progress-row"><div class="progress-row__left"><span class="progress-label">Progress</span>' +
         '<div class="progress-track progress-track--sm"><div class="progress-fill progress-fill--ok" style="width:100%"></div></div>' +
         '<span class="progress-pct">100%</span></div><span class="pill pill--ok">No Balance</span></div></div>',
@@ -2096,7 +2609,7 @@ function myaProgress(pct) {
         { label: "Client account balance cleared", done: false, status: "Outstanding" },
         { label: "Residual balance cleared", done: true, status: "Completed" },
       ],
-      card: '<div class="mini-card"><p class="mini-card__title">Purchase of 6 Harbour View, Poole · J4455/1</p>' +
+      card: '<div class="mini-card"><div class="mini-card__head"><p class="mini-card__ref">J4455/1</p><p class="mini-card__title">Purchase of 6 Harbour View, Poole</p></div>' +
         '<div class="progress-row"><div class="progress-row__left"><span class="progress-label">Progress</span>' +
         '<div class="progress-track progress-track--sm"><div class="progress-fill progress-fill--warn" style="width:80%"></div></div>' +
         '<span class="progress-pct">80%</span></div><span class="pill pill--error">£320.00 to clear</span></div></div>',
@@ -2114,7 +2627,7 @@ function myaProgress(pct) {
         { label: "Lender consent obtained", done: true, status: "Completed" },
         { label: "Residual balance cleared", done: true, status: "Completed" },
       ],
-      card: '<div class="mini-card"><p class="mini-card__title">Transfer of Equity, 19 Millgate · K1120/5</p>' +
+      card: '<div class="mini-card"><div class="mini-card__head"><p class="mini-card__ref">K1120/5</p><p class="mini-card__title">Transfer of Equity, 19 Millgate</p></div>' +
         '<div class="progress-row"><div class="progress-row__left"><span class="progress-label">Progress</span>' +
         '<div class="progress-track progress-track--sm"><div class="progress-fill progress-fill--ok" style="width:100%"></div></div>' +
         '<span class="progress-pct">100%</span></div><span class="pill pill--ok">No Balance</span></div></div>',
@@ -2132,7 +2645,7 @@ function myaProgress(pct) {
         { label: "Estate agent invoice settled", done: false, status: "Outstanding" },
         { label: "Residual balance cleared", done: true, status: "Completed" },
       ],
-      card: '<div class="mini-card"><p class="mini-card__title">Sale of 2 Station Road, Devizes · L7788/2</p>' +
+      card: '<div class="mini-card"><div class="mini-card__head"><p class="mini-card__ref">L7788/2</p><p class="mini-card__title">Sale of 2 Station Road, Devizes</p></div>' +
         '<div class="progress-row"><div class="progress-row__left"><span class="progress-label">Progress</span>' +
         '<div class="progress-track progress-track--sm"><div class="progress-fill progress-fill--warn" style="width:80%"></div></div>' +
         '<span class="progress-pct">80%</span></div><span class="pill pill--error">£95.50 to clear</span></div></div>',
@@ -2150,7 +2663,7 @@ function myaProgress(pct) {
         { label: "Client account balance cleared", done: true, status: "Completed" },
         { label: "Residual balance cleared", done: true, status: "Completed" },
       ],
-      card: '<div class="mini-card"><p class="mini-card__title">Purchase of Abbey Lodge, Malmesbury · M9903/6</p>' +
+      card: '<div class="mini-card"><div class="mini-card__head"><p class="mini-card__ref">M9903/6</p><p class="mini-card__title">Purchase of Abbey Lodge, Malmesbury</p></div>' +
         '<div class="progress-row"><div class="progress-row__left"><span class="progress-label">Progress</span>' +
         '<div class="progress-track progress-track--sm"><div class="progress-fill progress-fill--ok" style="width:100%"></div></div>' +
         '<span class="progress-pct">100%</span></div><span class="pill pill--ok">No Balance</span></div></div>',
@@ -2230,9 +2743,9 @@ function myaProgress(pct) {
         { label: "Proof of address", done: true, status: "Recieved" },
         { label: "Source of funds", done: false, status: "Outstanding" },
       ],
-      card: '<div class="aml-card"><p class="aml-card__sub">Bicester Land Co Ltd · Opened 9 days ago</p>' +
-        '<p class="aml-card__title">Land Promotion Agreement, Launton · H6533/1</p>' +
-        '<div class="aml-card__chips"><span class="aml-chip">ID Verification</span><span class="aml-chip">Source of funds</span></div></div>',
+      card: '<div class="aml-card"><div class="aml-card__chips"><span class="aml-chip">ID Verification</span><span class="aml-chip">Source of funds</span></div>' +
+        '<p class="aml-card__title">Land Promotion Agreement, Launton</p>' +
+        '<p class="aml-card__sub">H6533/1 - Bicester Land Co Ltd</p></div>',
       status: null,
     },
     {
@@ -2245,9 +2758,9 @@ function myaProgress(pct) {
         { label: "Proof of address", done: true, status: "Recieved" },
         { label: "Source of funds", done: false, status: "Outstanding" },
       ],
-      card: '<div class="aml-card"><p class="aml-card__sub">Jonathan Reece · Opened 4 days ago</p>' +
-        '<p class="aml-card__title">Purchase 8 Bloomsbury Court · A25/1</p>' +
-        '<div class="aml-card__chips"><span class="aml-chip">Source of funds</span></div></div>',
+      card: '<div class="aml-card"><div class="aml-card__chips"><span class="aml-chip">Source of funds</span></div>' +
+        '<p class="aml-card__title">Purchase 8 Bloomsbury Court</p>' +
+        '<p class="aml-card__sub">A25/1 - Jonathan Reece</p></div>',
       status: null,
     },
     {
@@ -2260,9 +2773,9 @@ function myaProgress(pct) {
         { label: "Proof of address", done: true, status: "Recieved" },
         { label: "Source of funds", done: false, status: "Outstanding" },
       ],
-      card: '<div class="aml-card"><p class="aml-card__sub">Oakford Estates Ltd · Opened 6 days ago</p>' +
-        '<p class="aml-card__title">Purchase of Mill Yard Studios · N2040/1</p>' +
-        '<div class="aml-card__chips"><span class="aml-chip">Source of funds</span></div></div>',
+      card: '<div class="aml-card"><div class="aml-card__chips"><span class="aml-chip">Source of funds</span></div>' +
+        '<p class="aml-card__title">Purchase of Mill Yard Studios</p>' +
+        '<p class="aml-card__sub">N2040/1 - Oakford Estates Ltd</p></div>',
       status: null,
     },
     {
@@ -2275,9 +2788,9 @@ function myaProgress(pct) {
         { label: "Proof of address", done: true, status: "Recieved" },
         { label: "Source of funds", done: false, status: "Outstanding" },
       ],
-      card: '<div class="aml-card"><p class="aml-card__sub">Harbour & Co LLP · Opened 11 days ago</p>' +
-        '<p class="aml-card__title">Lease of Unit 4, Foundry Park · N5510/2</p>' +
-        '<div class="aml-card__chips"><span class="aml-chip">ID Verification</span><span class="aml-chip">Source of funds</span></div></div>',
+      card: '<div class="aml-card"><div class="aml-card__chips"><span class="aml-chip">ID Verification</span><span class="aml-chip">Source of funds</span></div>' +
+        '<p class="aml-card__title">Lease of Unit 4, Foundry Park</p>' +
+        '<p class="aml-card__sub">N5510/2 - Harbour & Co LLP</p></div>',
       status: null,
     },
     {
@@ -2290,9 +2803,9 @@ function myaProgress(pct) {
         { label: "Proof of address", done: false, status: "Outstanding" },
         { label: "Source of funds", done: true, status: "Recieved" },
       ],
-      card: '<div class="aml-card"><p class="aml-card__sub">Jonah Okafor · Opened 3 days ago</p>' +
-        '<p class="aml-card__title">Purchase of 2 Bridge Street · N8820/4</p>' +
-        '<div class="aml-card__chips"><span class="aml-chip">Proof of address</span></div></div>',
+      card: '<div class="aml-card"><div class="aml-card__chips"><span class="aml-chip">Proof of address</span></div>' +
+        '<p class="aml-card__title">Purchase of 2 Bridge Street</p>' +
+        '<p class="aml-card__sub">N8820/4 - Jonah Okafor</p></div>',
       status: null,
     },
     {
@@ -2305,9 +2818,9 @@ function myaProgress(pct) {
         { label: "Proof of address", done: false, status: "Outstanding" },
         { label: "Source of funds", done: true, status: "Recieved" },
       ],
-      card: '<div class="aml-card"><p class="aml-card__sub">Yusuf Rahman · Opened 5 days ago</p>' +
-        '<p class="aml-card__title">Purchase of 44 Cobbler’s Yard · N9931/7</p>' +
-        '<div class="aml-card__chips"><span class="aml-chip">ID Verification</span><span class="aml-chip">Proof of address</span></div></div>',
+      card: '<div class="aml-card"><div class="aml-card__chips"><span class="aml-chip">ID Verification</span><span class="aml-chip">Proof of address</span></div>' +
+        '<p class="aml-card__title">Purchase of 44 Cobbler’s Yard</p>' +
+        '<p class="aml-card__sub">N9931/7 - Yusuf Rahman</p></div>',
       status: null,
     },
   ];
