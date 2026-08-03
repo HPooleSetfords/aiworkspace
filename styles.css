@@ -191,7 +191,7 @@ a { text-decoration: none; color: inherit; }
   background: linear-gradient(135deg, #f7fcfe 0%, #e6f5fa 52%, #cfeaf4 100%);
 }
 /* FireCMS Neat animated gradient — fills the content area, sits behind the
-   cards. The Mya banner / chips' backdrop-blur frosts this layer. */
+   cards. The banner / chips' backdrop-blur frosts this layer. */
 .content__bg {
   position: absolute;
   inset: 0;
@@ -202,7 +202,7 @@ a { text-decoration: none; color: inherit; }
   pointer-events: none;
 }
 
-/* ---------- GREETING + MYA NOTE ---------- */
+/* ---------- GREETING + AI NOTE ---------- */
 .page-top { display: flex; flex-direction: column; gap: 12px; }
 .page-header {
   display: flex;
@@ -294,8 +294,8 @@ a { text-decoration: none; color: inherit; }
 .page-header__cancel[hidden],
 .page-header__save[hidden] { display: none; }
 
-/* Mya note banner */
-.mya-note {
+/* Ai note banner */
+.ai-note {
   display: flex;
   gap: 12px;
   align-items: center;
@@ -308,32 +308,13 @@ a { text-decoration: none; color: inherit; }
   padding: 14px 18px 14px 16px;
   color: var(--on-primary-container);
 }
-.mya-note__icon { color: #004d64; font-size: 24px; align-self: flex-start; flex-shrink: 0; }
-.mya-note__text { display: flex; flex-direction: column; gap: 3px; }
-.mya-note__title { margin: 0; font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: .1px; }
-.mya-note__body { margin: 0; font-size: 14px; font-weight: 400; line-height: 20px; letter-spacing: .25px; }
+.ai-note__icon { color: #004d64; font-size: 24px; align-self: flex-start; flex-shrink: 0; }
+.ai-note__text { display: flex; flex-direction: column; gap: 3px; }
+.ai-note__title { margin: 0; font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: .1px; }
+.ai-note__body { margin: 0; font-size: 14px; font-weight: 400; line-height: 20px; letter-spacing: .25px; }
 
-/* ---------- WIDGET GRID (column-span, editable) ----------
-   A 6-column grid with 332px row tracks. Each block owns its width (--cspan:
-   2=⅓, 3=½, 4=⅔, 6=full) and height (--rspan, 1–6 rows); resizing one never
-   resizes a neighbour — they just reflow. */
-.widget-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-auto-rows: 332px;
-  gap: 32px;
-}
-.widget {
-  grid-column: span var(--cspan, 2);
-  grid-row: span var(--rspan, 1);
-  min-width: 0;
-  position: relative;
-  overflow: hidden;
-}
-@media (max-width: 900px) {
-  .widget-grid { grid-template-columns: 1fr; }
-  .widget { grid-column: 1 / -1 !important; }
-}
+/* The editable grid now lives in dashboard.css (.blocks / .cell), which
+   owns the 12-track column model the Intelligent Dashboard uses. */
 
 /* ============================ CARD BASE ============================ */
 .card {
@@ -394,7 +375,7 @@ a { text-decoration: none; color: inherit; }
 .search-row.block-item:hover { background: var(--slate-100); }
 .relation.block-item:hover .bubble { box-shadow: 0 2px 10px rgba(0, 117, 149, .15); }
 
-/* Card footer (Mya chip + tonal action) */
+/* Card footer (Ai chip + tonal action) */
 .w-foot {
   flex-shrink: 0;
   display: flex;
@@ -404,8 +385,8 @@ a { text-decoration: none; color: inherit; }
 }
 .w-foot--end { justify-content: flex-end; }
 
-/* Mya suggestion chip */
-.mya-chip {
+/* Ai suggestion chip */
+.ai-chip {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -425,7 +406,7 @@ a { text-decoration: none; color: inherit; }
   overflow: hidden;
 }
 .w-foot .btn-tonal { flex-shrink: 0; }
-.mya-chip .material-symbols-outlined { font-size: 18px; color: #004d64; }
+.ai-chip .material-symbols-outlined { font-size: 18px; color: #004d64; }
 
 /* Buttons */
 .btn-primary {
@@ -625,7 +606,7 @@ a { text-decoration: none; color: inherit; }
   letter-spacing: .1px;
   color: var(--on-surface);
 }
-/* Mya-suggested reply (queued from a search anomaly) — quieter than client msgs. */
+/* Ai-suggested reply (queued from a search anomaly) — quieter than client msgs. */
 .msg-card__tag { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; color: var(--brand); white-space: nowrap; }
 .msg-card__tag .material-symbols-outlined { font-size: 14px; }
 
@@ -783,85 +764,9 @@ a { text-decoration: none; color: inherit; }
   white-space: nowrap;
 }
 
-/* ========================= BILLS & PAYMENTS ========================= */
-.card--chart { padding: 16px 20px; gap: 8px; }
-.chart {
-  position: relative;
-  width: 100%;
-  min-width: 0;
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-.chart__legend { display: flex; gap: 23px; justify-content: flex-end; margin-bottom: 12px; }
-.legend { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; color: var(--text-secondary); }
-.legend__dot { width: 9px; height: 9px; border-radius: 2px; }
-.legend__dot--bills { background: var(--bills); }
-.legend__dot--pay { background: var(--payments); }
-.chart__plot {
-  --axis-w: 44px;
-  --label-h: 22px;
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
-  padding-left: var(--axis-w);
-  margin-bottom: var(--label-h);
-}
-.chart__grid { position: absolute; left: var(--axis-w); right: 0; top: 0; height: 100%; }
-.grid-line { position: absolute; left: 0; right: 0; height: 0; border-top: 1px solid var(--border-secondary); }
-.grid-line:nth-child(1) { top: 0; }
-.grid-line:nth-child(2) { top: 33.333%; }
-.grid-line:nth-child(3) { top: 66.666%; }
-.grid-line:nth-child(4) { top: 100%; }
-.grid-line span {
-  position: absolute;
-  left: calc(-1 * var(--axis-w));
-  top: -8px;
-  width: calc(var(--axis-w) - 10px);
-  text-align: right;
-  font-size: 12px;
-  color: var(--text-secondary);
-  line-height: 16px;
-}
-.chart__bars { position: relative; z-index: 1; height: 100%; display: flex; align-items: flex-end; gap: 4px; }
-.bar-group { position: relative; flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; align-items: center; }
-.bar-group__bars { display: flex; gap: 2px; align-items: flex-end; width: 100%; height: 100%; }
-.bar { flex: 1 1 0; min-width: 0; border-radius: 6px 6px 0 0; }
-.bar--bills { background: var(--bills); }
-.bar--pay { background: var(--payments); }
-.bar-group__label {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 12px;
-  color: var(--text-secondary);
-  line-height: 16px;
-  white-space: nowrap;
-}
-.figures { display: flex; gap: 12px; flex-shrink: 0; }
-.figure { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-.figure__label { font-size: 14px; font-weight: 500; color: var(--text-secondary); line-height: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.figure__value { font-size: 14px; font-weight: 600; line-height: 20px; color: var(--text-primary); }
-.figure__value--neg { color: var(--text-negative); }
-
-/* ============================ PAF CARD ============================ */
-.card--paf { padding: 16px 20px; align-items: center; }
-.card--paf .w-head { align-self: stretch; }
-.paf__pie {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  margin: 32px 0 17px;
-  background: conic-gradient(var(--amber) 0deg 95deg, #fde2bd 95deg 360deg);
-}
-.paf__timer { display: flex; flex-direction: column; align-items: center; text-align: center; }
-.paf__time { font-size: 30px; line-height: 36px; color: var(--text-primary); }
-.paf__time b { font-weight: 700; }
-.paf__time i { font-style: normal; font-weight: 700; color: var(--text-secondary); }
-.paf__caption { font-size: 14px; color: var(--text-secondary); line-height: 20px; }
+/* The Bills & payments and PAF Deadline blocks now live in dashboard.css
+   (Intelligent Dashboard redesign) — their old rules were removed so the
+   new .chart / .paf__ styles aren't shadowed. */
 
 /* ============================ RECENT MATTERS ============================ */
 .card--recent { gap: 8px; }
@@ -1141,8 +1046,8 @@ a { text-decoration: none; color: inherit; }
 .modal__body { scrollbar-width: thin; scrollbar-color: rgba(0, 146, 184, 0.5) var(--slate-200); }
 
 /* ============================ EDIT MODE ============================ */
-.content.is-editing .widget { overflow: hidden; }
-.content.is-editing .widget::after {
+.is-editing .widget { overflow: hidden; }
+.is-editing .widget::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -1151,11 +1056,11 @@ a { text-decoration: none; color: inherit; }
   pointer-events: none;
   z-index: 2;
 }
-.content.is-editing .widget.is-dragging { opacity: .4; }
-.content.is-editing .widget.drop-before::after { border-color: var(--accent); border-width: 2px; }
+.is-editing .widget.is-dragging { opacity: .4; }
+.is-editing .widget.drop-before::after { border-color: var(--accent); border-width: 2px; }
 
 .widget__controls { position: absolute; top: 6px; right: 8px; z-index: 3; display: none; gap: 2px; }
-.content.is-editing .widget__controls { display: flex; }
+.is-editing .widget__controls { display: flex; }
 .widget__btn {
   width: 32px;
   height: 32px;
@@ -1175,7 +1080,7 @@ a { text-decoration: none; color: inherit; }
 .widget__btn--drag:active { cursor: grabbing; }
 
 .widget__resize { position: absolute; z-index: 3; display: none; align-items: center; justify-content: center; }
-.content.is-editing .widget__resize { display: flex; }
+.is-editing .widget__resize { display: flex; }
 .widget__resize::before { content: ""; border-radius: 4px; background: var(--slate-300); }
 .widget__resize:hover::before { background: var(--accent); }
 .widget__resize--x { top: 0; right: 0; width: 12px; height: 100%; cursor: ew-resize; }
@@ -1724,8 +1629,8 @@ a { text-decoration: none; color: inherit; }
   .spinner { animation-duration: 1.2s; }
 }
 
-/* Mya chip reads solid on the white modal surface (not frosted). */
-.modal .mya-chip {
+/* Ai chip reads solid on the white modal surface (not frosted). */
+.modal .ai-chip {
   background: var(--scheme-primary-container);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -1735,8 +1640,8 @@ a { text-decoration: none; color: inherit; }
 .modal--review { width: 640px; }
 .modal__head--stack { align-items: flex-start; }
 .modal__titles { flex: 0 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-/* "Created by Mya" note sits next to the title; close is pushed to the far end. */
-.mya-chip--head { flex-shrink: 0; }
+/* "Created by Ai" note sits next to the title; close is pushed to the far end. */
+.ai-chip--head { flex-shrink: 0; }
 .modal__head .modal__close { margin-left: auto; }
 .modal__subtitle { margin: 0; font-size: 13px; font-weight: 500; line-height: 18px; color: var(--on-surface-variant); }
 .modal__intro {
@@ -1777,6 +1682,10 @@ a { text-decoration: none; color: inherit; }
 
 /* ---------- AML / Matters checklists ---------- */
 .acc-head__meta { font-size: 12px; font-weight: 400; line-height: 16px; color: var(--on-surface-variant); }
+/* OS badge sitting inline in a row's meta line (search messages). inline-block
+   so the badge's own text baseline is the box's baseline, keeping it level with
+   the words either side. */
+.acc-head__meta .search-os { display: inline-block; vertical-align: baseline; margin: 0 2px; }
 .pill-progress { flex-shrink: 0; padding: 3px 8px; border-radius: 8px; font-size: 12px; font-weight: 500; line-height: 16px; white-space: nowrap; }
 .pill-progress--no { background: var(--error-container); color: var(--on-error-container); }
 .pill-progress--warn { background: #ffdcbc; color: #683c00; }
@@ -1984,8 +1893,8 @@ a { text-decoration: none; color: inherit; }
 .sd-pdf { color: #c62828; font-size: 20px; flex-shrink: 0; }
 .sd-id { flex: 1; min-width: 0; font-size: 14px; color: var(--on-primary-container); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sd-id b { font-weight: 600; }
-.sd-mya, .sd-saved { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--on-surface-variant); flex-shrink: 0; white-space: nowrap; }
-.sd-mya .material-symbols-outlined { font-size: 16px; color: var(--brand); }
+.sd-ai, .sd-saved { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--on-surface-variant); flex-shrink: 0; white-space: nowrap; }
+.sd-ai .material-symbols-outlined { font-size: 16px; color: var(--brand); }
 .sd-saved .material-symbols-outlined { font-size: 16px; }
 /* Header edit / collapse behave as icon buttons (drive the header height). */
 .sd-edit, .sd-chev {
@@ -2036,7 +1945,7 @@ a { text-decoration: none; color: inherit; }
 .sd-cert-label { margin: 20px 0 6px; font-size: 14px; font-weight: 600; color: var(--on-surface); }
 .sd-result { margin: 0; font-size: 14px; line-height: 20px; color: var(--on-surface); }
 .sd-anoms { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 12px; font-size: 14px; line-height: 20px; color: var(--on-surface); }
-/* Mya recommendation — full-width footer bar of the certificate card. */
+/* Ai recommendation — full-width footer bar of the certificate card. */
 .sd-help {
   display: flex;
   align-items: center;

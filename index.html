@@ -3,629 +3,521 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Halo — Dashboard</title>
+  <title>Halo — Intelligent Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..600,0..1,0" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="dashboard.css" />
   <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
 </head>
-<body>
-  <!-- ============================ TOP NAV ============================ -->
-  <header class="top-nav">
-    <div class="top-nav__wrapper">
-      <a class="logo" href="#" aria-label="Halo, a setfords product">
-        <img class="logo__mark" src="assets/halo.svg" alt="halo" />
-        <img class="logo__tm" src="assets/halo-g2.svg" alt="" />
-        <img class="logo__sub" src="assets/halo-g1.svg" alt="a setfords product" />
-      </a>
-      <nav class="top-nav__actions" aria-label="User">
-        <a class="top-nav__item" href="#">
-          <span class="material-symbols-outlined">search</span>
-          <span>Search</span>
-        </a>
-        <a class="top-nav__item" href="#">
-          <span class="material-symbols-outlined">help</span>
-          <span>Help</span>
-        </a>
-        <a class="top-nav__item" href="#">
-          <span class="material-symbols-outlined">notifications</span>
-          <span>Notifications</span>
-        </a>
-        <a class="top-nav__item" href="#">
-          <span class="material-symbols-outlined">account_circle</span>
-          <span>John Doe</span>
-        </a>
-      </nav>
-    </div>
+<body class="halo">
+
+  <!-- ============================ TOP APP BAR ============================ -->
+  <header class="topbar">
+    <a class="topbar__logo" href="#" aria-label="Halo">
+      <img src="assets/halo-logo.svg" alt="Halo" />
+    </a>
+    <nav class="topbar__actions" aria-label="User">
+      <button class="iconbtn" type="button" aria-label="Search"><span class="material-symbols-outlined">search</span></button>
+      <button class="iconbtn" type="button" aria-label="Help"><span class="material-symbols-outlined">help</span></button>
+      <button class="iconbtn" type="button" aria-label="Notifications"><span class="material-symbols-outlined">notifications</span></button>
+      <button class="iconbtn" type="button" aria-label="Account"><span class="material-symbols-outlined">account_circle</span></button>
+    </nav>
   </header>
 
-  <div class="shell">
-    <!-- ========================= NAV DRAWER ========================= -->
-    <aside class="drawer">
-      <button class="drawer__toggle" aria-label="Collapse menu">
-        <span class="material-symbols-outlined">menu_open</span>
-      </button>
-      <nav class="drawer__menu" aria-label="Primary">
-        <a class="menu-item menu-item--active" href="#">
-          <span class="material-symbols-outlined">dashboard</span>
-          <span class="menu-item__label">Dashboard</span>
-        </a>
-        <a class="menu-item" href="#">
-          <span class="material-symbols-outlined">work</span>
-          <span class="menu-item__label">Matters</span>
-        </a>
-        <a class="menu-item" href="#">
-          <span class="material-symbols-outlined">contact_page</span>
-          <span class="menu-item__label">Clients</span>
-        </a>
-        <a class="menu-item" href="#">
-          <span class="material-symbols-outlined">point_of_sale</span>
-          <span class="menu-item__label">Accounting</span>
-          <span class="material-symbols-outlined menu-item__chevron">keyboard_arrow_down</span>
-        </a>
-        <a class="menu-item" href="#">
-          <span class="material-symbols-outlined">corporate_fare</span>
-          <span class="menu-item__label">Head Office</span>
-          <span class="material-symbols-outlined menu-item__chevron">keyboard_arrow_down</span>
-        </a>
-        <a class="menu-item" href="#">
-          <span class="material-symbols-outlined">tab</span>
-          <span class="menu-item__label">Reports</span>
-          <span class="material-symbols-outlined menu-item__chevron">keyboard_arrow_down</span>
-        </a>
-        <a class="menu-item" href="#">
-          <span class="material-symbols-outlined">admin_panel_settings</span>
-          <span class="menu-item__label">Settings</span>
-          <span class="material-symbols-outlined menu-item__chevron">keyboard_arrow_down</span>
-        </a>
-      </nav>
+  <div class="layout">
+
+    <!-- ======================= NAVIGATION RAIL ======================= -->
+    <aside class="rail" aria-label="Primary">
+      <div class="rail__top">
+        <button class="iconbtn iconbtn--rail" type="button" aria-label="Collapse menu">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+        <nav class="rail__menu">
+          <a class="navitem navitem--active" href="#">
+            <span class="navitem__main"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></span>
+          </a>
+          <a class="navitem" href="#">
+            <span class="navitem__main"><span class="material-symbols-outlined">cases</span><span>Client Matters</span></span>
+          </a>
+          <a class="navitem" href="#">
+            <span class="navitem__main"><span class="material-symbols-outlined">article_person</span><span>Clients</span></span>
+          </a>
+          <a class="navitem" href="#">
+            <span class="navitem__main"><span class="material-symbols-outlined">point_of_sale</span><span>Accounting</span></span>
+          </a>
+          <a class="navitem" href="#">
+            <span class="navitem__main"><span class="material-symbols-outlined">corporate_fare</span><span>Head office</span></span>
+            <span class="material-symbols-outlined navitem__chev">keyboard_arrow_down</span>
+          </a>
+          <a class="navitem" href="#">
+            <span class="navitem__main"><span class="material-symbols-outlined">tab</span><span>Reports</span></span>
+            <span class="material-symbols-outlined navitem__chev">keyboard_arrow_down</span>
+          </a>
+          <a class="navitem" href="#">
+            <span class="navitem__main"><span class="material-symbols-outlined">admin_panel_settings</span><span>Settings</span></span>
+            <span class="material-symbols-outlined navitem__chev">keyboard_arrow_down</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="wallet">
+        <p class="wallet__title">Ai token usage</p>
+        <div class="wallet__meter">
+          <div class="wallet__row">
+            <div class="wallet__nums">
+              <p class="wallet__used">3,200 used</p>
+              <p class="wallet__left">16,800 left</p>
+            </div>
+            <img class="wallet__ring" src="assets/token-ring.svg" alt="" />
+          </div>
+          <p class="wallet__reset">Resets 1 August 2026</p>
+        </div>
+      </div>
     </aside>
 
     <!-- =========================== CONTENT =========================== -->
-    <main class="content">
-      <!-- Animated WebGL gradient backdrop (FireCMS Neat) -->
-      <canvas id="gradient" class="content__bg" aria-hidden="true"></canvas>
+    <main class="main">
 
-      <!-- GREETING + MYA NOTE -->
-      <div class="page-top">
-        <header class="page-header">
-          <h1 class="page-header__title">Good morning, Harry</h1>
-          <div class="page-header__actions">
-            <button class="page-header__reorder" type="button" hidden>
-              <span class="material-symbols-outlined">swap_vert</span>Re-order
-            </button>
-            <button class="page-header__addwidgets" type="button" hidden>
-              <span class="material-symbols-outlined">add</span>Add widgets
-            </button>
-            <button class="page-header__cancel" type="button" hidden>Cancel</button>
-            <button class="page-header__save" type="button" hidden>Save</button>
-            <button class="page-header__edit" type="button" aria-pressed="false">
-              <span class="material-symbols-outlined">edit</span>Customise
-            </button>
+      <div class="pagehead">
+        <div class="pagehead__left">
+          <div class="pagehead__titles">
+            <h1 class="pagehead__title">Intelligent Dashboard</h1>
+            <p class="pagehead__sub">Matter management powered by Ai</p>
+            <p class="pagehead__desc">Interact with Halo’s Ai assistants to run analysis, then choose how to use it’s response.</p>
           </div>
-        </header>
 
-        <div class="mya-note">
-          <span class="material-symbols-outlined mya-note__icon">cognition</span>
-          <div class="mya-note__text">
-            <p class="mya-note__title">A note from Mya</p>
-            <p class="mya-note__body">Nice work! Your 34 active matters are in good shape. There are 31 things worth your attention: 9 replies to send, 5 relationships to nurture, 7 matters ready to close, 6 AML checks to complete and 4 searches to follow up.</p>
+          <div class="filters">
+            <p class="filters__label">Filter by assistant</p>
+            <div class="filters__row" id="assistantFilters">
+              <button class="assistant assistant--finance" type="button" data-assistant="finance" aria-pressed="false">
+                <ai-orb class="assistant__ring" variant="finance"></ai-orb>
+                <span class="assistant__text">
+                  <span class="assistant__name">Finance</span>
+                  <span class="assistant__desc">Help with finance tasks</span>
+                </span>
+              </button>
+              <button class="assistant assistant--operations" type="button" data-assistant="operations" aria-pressed="false">
+                <ai-orb class="assistant__ring" variant="operations"></ai-orb>
+                <span class="assistant__text">
+                  <span class="assistant__name">Operations</span>
+                  <span class="assistant__desc">Help with operational tasks</span>
+                </span>
+              </button>
+              <button class="assistant assistant--communications" type="button" data-assistant="communications" aria-pressed="false">
+                <ai-orb class="assistant__ring" variant="communications"></ai-orb>
+                <span class="assistant__text">
+                  <span class="assistant__name">Communications</span>
+                  <span class="assistant__desc">Help with communications</span>
+                </span>
+              </button>
+            </div>
           </div>
+        </div>
+
+        <div class="pagehead__actions">
+          <button class="textbtn page-header__reorder" type="button" hidden>
+            <span class="material-symbols-outlined">swap_vert</span>Re-order
+          </button>
+          <button class="textbtn page-header__addwidgets" type="button" hidden>
+            <span class="material-symbols-outlined">add</span>Add widgets
+          </button>
+          <button class="outlinebtn page-header__cancel" type="button" hidden>Cancel</button>
+          <button class="filledbtn page-header__save" type="button" hidden>Save</button>
+          <button class="textbtn textbtn--customise page-header__edit" type="button" aria-pressed="false">
+            <span class="material-symbols-outlined">edit</span>Customise
+          </button>
         </div>
       </div>
 
-      <!-- WIDGET GRID -->
-      <div class="widget-grid" id="widgetGrid">
+      <!-- ========================= AI BLOCKS ========================= -->
+      <div class="blocks" id="aiBlocks">
 
-        <!-- Todays to-do's -->
-        <section class="card widget card--todos" data-widget-id="todos">
-          <div class="w-head">
-            <h2 class="w-title">Todays to-do’s</h2>
-            <span class="w-count">0 of 31 complete</span>
+        <!-- Halo Ai Chat promo -->
+        <section class="cell cell--promo" id="chatPromo">
+          <img class="promo__bg" src="assets/promo-bg.png" alt="" />
+          <div class="promo__head">
+            <div class="aicard__headleft">
+              <ai-orb class="promo__avatar" variant="halo"></ai-orb>
+              <p class="promo__title">Halo Ai Chat is coming</p>
+            </div>
+            <button class="iconbtn promo__close" type="button" aria-label="Dismiss">
+              <span class="material-symbols-outlined">close</span>
+            </button>
           </div>
-          <div class="card__scroll">
-            <div class="progress-track"><div class="progress-fill" style="width:0%"></div></div>
-            <ul class="todo-list">
-              <li class="todo-row" data-todo="replies">
-                <span class="todo-left">
-                  <span class="todo-dot todo-dot--alert"></span>
-                  <span class="todo-n">9</span>
-                  <span class="todo-label">Replies to send</span>
-                </span>
-                <span class="todo-meta">Oldest 6 days</span>
-              </li>
-              <li class="todo-row" data-todo="relations">
-                <span class="todo-left">
-                  <span class="todo-dot todo-dot--alert"></span>
-                  <span class="todo-n">5</span>
-                  <span class="todo-label">Relations to nurture</span>
-                </span>
-                <span class="todo-meta">Worth a check-in</span>
-              </li>
-              <li class="todo-row" data-todo="matters">
-                <span class="todo-left">
-                  <span class="todo-dot todo-dot--info"></span>
-                  <span class="todo-n">7</span>
-                  <span class="todo-label">Matters ready to close</span>
-                </span>
-                <span class="todo-meta">1 task to go</span>
-              </li>
-              <li class="todo-row" data-todo="aml">
-                <span class="todo-left">
-                  <span class="todo-dot todo-dot--alert"></span>
-                  <span class="todo-n">6</span>
-                  <span class="todo-label">AML checks to complete</span>
-                </span>
-                <span class="todo-meta">9 missing parts</span>
-              </li>
-              <li class="todo-row" data-todo="searches">
-                <span class="todo-left">
-                  <span class="todo-dot todo-dot--alert"></span>
-                  <span class="todo-n">4</span>
-                  <span class="todo-label">Searches to follow-up</span>
-                </span>
-                <span class="todo-meta">1 due today</span>
-              </li>
-            </ul>
-          </div>
+          <p class="promo__body">As we’re currently developing our Ai to enable custom prompt-to-response functionality, we/ve enabled pre-made prompts within dashboard widgets to assist on matter management.</p>
+          <div class="promo__art"><img src="assets/ask-halo.png" alt="Ask Halo" /></div>
         </section>
 
-        <!-- Matters ready to close -->
-        <section class="card widget" data-widget-id="matters-close">
-          <div class="w-head">
-            <h2 class="w-title">Matters ready to close</h2>
-            <span class="w-count">2</span>
+        <!-- Draft replies to send -->
+        <section class="cell widget aicard" data-widget-id="replies" data-block="replies" data-assistant="communications" data-state="prompt">
+
+          <!-- Step 1 — pre-canned prompts -->
+          <div class="aicard__prompt">
+            <div class="aicard__head aicard__head--plain">
+              <div class="aicard__headleft">
+                <ai-orb class="aicard__avatar" variant="communications"></ai-orb>
+                <p class="aicard__title">Draft replies to send</p>
+              </div>
+            </div>
+            <div class="aicard__promptbody">
+              <p class="aicard__label">Prompt or upload emails for review:</p>
+              <div class="prompts">
+                  <button class="pchip pchip--communications" type="button" data-prompt="0">
+                    <span class="pchip__text">Draft replies to all my unanswered emails from the last 3 days</span>
+                    <span class="pchip__tokens">~1.6k</span>
+                  </button>
+              </div>
+                <button class="upzone" type="button" data-upload>
+                  <img class="upzone__icon" src="assets/icon-upload.svg" alt="" />
+                  <span class="upzone__label">Upload an email or thread</span>
+                </button>
+                <input class="upzone__input" type="file" hidden data-upload-input />
+            </div>
+            <p class="aicard__loadtext">Thinking...</p>
           </div>
-          <div class="card__scroll">
-            <div class="mini-card">
-              <p class="mini-card__title">Sale of 32 The Maltings, Tewkesbury A1264/2</p>
-              <div class="progress-row">
-                <div class="progress-row__left">
-                  <span class="progress-label">Progress</span>
-                  <div class="progress-track progress-track--sm"><div class="progress-fill progress-fill--warn" style="width:80%"></div></div>
-                  <span class="progress-pct">80%</span>
+
+          <!-- Step 2 — stacked result cards -->
+          <div class="aicard__results">
+            <div class="aicard__top">
+              <div class="aicard__head">
+                <div class="aicard__headleft">
+                  <ai-orb class="aicard__avatar" variant="communications"></ai-orb>
+                  <p class="aicard__title">Draft replies to send</p>
                 </div>
-                <span class="pill pill--error">£180.00 to clear</span>
+                <p class="aicard__count" data-count>1 of 9</p>
+                <button class="aicard__cycle" type="button" data-cycle aria-haspopup="true" aria-expanded="false" aria-label="Re-run this prompt on a schedule">
+                  <svg class="aicard__cycleglyph" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.53981 17.6079C5.09536 16.9412 3.92175 15.9343 3.01897 14.5871C2.1162 13.2398 1.66481 11.719 1.66481 10.0246C1.66481 9.66344 1.68217 9.30928 1.71689 8.96205C1.75161 8.61483 1.81064 8.27455 1.89397 7.94122L0.93564 8.50372L0.102307 7.06622L4.08147 4.77455L6.37314 8.73289L4.91481 9.56622L3.78981 7.60789C3.63703 7.98289 3.52245 8.37178 3.44606 8.77455C3.36967 9.17733 3.33147 9.594 3.33147 10.0246C3.33147 11.3718 3.69953 12.5975 4.43564 13.7016C5.17175 14.8058 6.15092 15.6218 7.37314 16.1496L6.53981 17.6079ZM12.9148 7.50372V5.83705H15.1856C14.5467 5.04539 13.7759 4.4308 12.8731 3.9933C11.9704 3.5558 11.012 3.33705 9.99814 3.33705C9.23425 3.33705 8.51203 3.45511 7.83147 3.69122C7.15092 3.92733 6.52592 4.26066 5.95647 4.69122L5.12314 3.23289C5.81758 2.74678 6.57453 2.36483 7.39397 2.08705C8.21342 1.80928 9.08147 1.67039 9.99814 1.67039C11.0954 1.67039 12.144 1.87525 13.144 2.28497C14.144 2.69469 15.0398 3.28844 15.8315 4.06622V2.92039H17.4981V7.50372H12.9148ZM12.3731 20.0037L8.39397 17.7121L10.6856 13.7537L12.1231 14.5871L10.9356 16.6287C12.5745 16.3926 13.9391 15.6496 15.0294 14.3996C16.1197 13.1496 16.6648 11.6843 16.6648 10.0037C16.6648 9.85094 16.6613 9.70858 16.6544 9.57664C16.6474 9.44469 16.6301 9.30928 16.6023 9.17039H18.2898C18.3037 9.30928 18.3141 9.44469 18.3211 9.57664C18.328 9.70858 18.3315 9.85094 18.3315 10.0037C18.3315 11.8787 17.7724 13.5558 16.6544 15.035C15.5363 16.5141 14.0815 17.5107 12.2898 18.0246L13.2065 18.5662L12.3731 20.0037Z" fill="currentColor"/></svg>
+                </button>
+              </div>
+              <div class="stack" data-stack></div>
+            </div>
+            <div class="aicard__foot">
+              <button class="textbtn" type="button" data-back>Back</button>
+              <button class="outlinebtn" type="button" data-action="open-replies">Review all</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Find documents -->
+        <section class="cell widget aicard" data-widget-id="documents" data-block="documents" data-assistant="operations" data-state="prompt">
+
+          <!-- Step 1 — pre-canned prompts -->
+          <div class="aicard__prompt">
+            <div class="aicard__head aicard__head--plain">
+              <div class="aicard__headleft">
+                <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
+                <p class="aicard__title">Find documents</p>
               </div>
             </div>
-            <div class="mini-card">
-              <p class="mini-card__title">Purchase of 14 Cedar Drive, Reading · B3320/7</p>
-              <div class="progress-row">
-                <div class="progress-row__left">
-                  <span class="progress-label">Progress</span>
-                  <div class="progress-track progress-track--sm"><div class="progress-fill progress-fill--ok" style="width:100%"></div></div>
-                  <span class="progress-pct">100%</span>
+            <div class="aicard__promptbody">
+              <p class="aicard__label">Prompt or upload emails for review:</p>
+              <div class="prompts">
+                  <button class="pchip pchip--operations" type="button" data-prompt="0">
+                    <span class="pchip__text">Find and extract all attachments from unread emails</span>
+                    <span class="pchip__tokens">~1.0k</span>
+                  </button>
+              </div>
+                <button class="upzone" type="button" data-upload>
+                  <img class="upzone__icon" src="assets/icon-upload.svg" alt="" />
+                  <span class="upzone__label">Upload an email or thread</span>
+                </button>
+                <input class="upzone__input" type="file" hidden data-upload-input />
+            </div>
+            <p class="aicard__loadtext">Thinking...</p>
+          </div>
+
+          <!-- Step 2 — stacked result cards -->
+          <div class="aicard__results">
+            <div class="aicard__top">
+              <div class="aicard__head">
+                <div class="aicard__headleft">
+                  <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
+                  <p class="aicard__title">Find documents</p>
                 </div>
-                <span class="pill pill--ok">No Balance</span>
+                <p class="aicard__count" data-count>1 of 6</p>
+                <button class="aicard__cycle" type="button" data-cycle aria-haspopup="true" aria-expanded="false" aria-label="Re-run this prompt on a schedule">
+                  <svg class="aicard__cycleglyph" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.53981 17.6079C5.09536 16.9412 3.92175 15.9343 3.01897 14.5871C2.1162 13.2398 1.66481 11.719 1.66481 10.0246C1.66481 9.66344 1.68217 9.30928 1.71689 8.96205C1.75161 8.61483 1.81064 8.27455 1.89397 7.94122L0.93564 8.50372L0.102307 7.06622L4.08147 4.77455L6.37314 8.73289L4.91481 9.56622L3.78981 7.60789C3.63703 7.98289 3.52245 8.37178 3.44606 8.77455C3.36967 9.17733 3.33147 9.594 3.33147 10.0246C3.33147 11.3718 3.69953 12.5975 4.43564 13.7016C5.17175 14.8058 6.15092 15.6218 7.37314 16.1496L6.53981 17.6079ZM12.9148 7.50372V5.83705H15.1856C14.5467 5.04539 13.7759 4.4308 12.8731 3.9933C11.9704 3.5558 11.012 3.33705 9.99814 3.33705C9.23425 3.33705 8.51203 3.45511 7.83147 3.69122C7.15092 3.92733 6.52592 4.26066 5.95647 4.69122L5.12314 3.23289C5.81758 2.74678 6.57453 2.36483 7.39397 2.08705C8.21342 1.80928 9.08147 1.67039 9.99814 1.67039C11.0954 1.67039 12.144 1.87525 13.144 2.28497C14.144 2.69469 15.0398 3.28844 15.8315 4.06622V2.92039H17.4981V7.50372H12.9148ZM12.3731 20.0037L8.39397 17.7121L10.6856 13.7537L12.1231 14.5871L10.9356 16.6287C12.5745 16.3926 13.9391 15.6496 15.0294 14.3996C16.1197 13.1496 16.6648 11.6843 16.6648 10.0037C16.6648 9.85094 16.6613 9.70858 16.6544 9.57664C16.6474 9.44469 16.6301 9.30928 16.6023 9.17039H18.2898C18.3037 9.30928 18.3141 9.44469 18.3211 9.57664C18.328 9.70858 18.3315 9.85094 18.3315 10.0037C18.3315 11.8787 17.7724 13.5558 16.6544 15.035C15.5363 16.5141 14.0815 17.5107 12.2898 18.0246L13.2065 18.5662L12.3731 20.0037Z" fill="currentColor"/></svg>
+                </button>
+              </div>
+              <div class="stack" data-stack></div>
+            </div>
+            <div class="aicard__foot">
+              <button class="textbtn" type="button" data-back>Back</button>
+              <button class="outlinebtn" type="button">Review all</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Help with client relations -->
+        <section class="cell widget aicard" data-widget-id="relations" data-block="relations" data-assistant="communications" data-state="prompt">
+
+          <!-- Step 1 — pre-canned prompts -->
+          <div class="aicard__prompt">
+            <div class="aicard__head aicard__head--plain">
+              <div class="aicard__headleft">
+                <ai-orb class="aicard__avatar" variant="communications"></ai-orb>
+                <p class="aicard__title">Help with client relations</p>
               </div>
             </div>
-          </div>
-          <div class="w-foot">
-            <span class="mya-chip"><span class="material-symbols-outlined">cognition</span>Reviewed - please confirm</span>
-            <button class="btn-tonal" type="button">Review</button>
-          </div>
-        </section>
-
-        <!-- Replies to send -->
-        <section class="card widget" data-widget-id="replies">
-          <div class="w-head">
-            <h2 class="w-title">Replies to send</h2>
-            <span class="w-count">2</span>
-          </div>
-          <div class="card__scroll">
-            <div class="msg-card">
-              <div class="msg-card__meta"><span>To: Hannah Whitmore - A1662/42</span><span>6 days ago</span></div>
-              <p class="msg-card__quote">“Can you confirm the freehold has agreed the revised premium before Friday?”</p>
+            <div class="aicard__promptbody">
+              <p class="aicard__label">Prompt or upload emails for review:</p>
+              <div class="prompts">
+                  <button class="pchip pchip--communications" type="button" data-prompt="0">
+                    <span class="pchip__text">Draft all messages to clients that are treating me poorly</span>
+                    <span class="pchip__tokens">~1.7k</span>
+                  </button>
+              </div>
+                <button class="upzone" type="button" data-upload>
+                  <img class="upzone__icon" src="assets/icon-upload.svg" alt="" />
+                  <span class="upzone__label">Upload a client message</span>
+                </button>
+                <input class="upzone__input" type="file" hidden data-upload-input />
             </div>
-            <div class="msg-card">
-              <div class="msg-card__meta"><span>To: Ralph Yaw Tutu · A1445/179</span><span>3 days ago</span></div>
-              <p class="msg-card__quote">“What are the next steps now the charge has been registered?”</p>
-            </div>
+            <p class="aicard__loadtext">Thinking...</p>
           </div>
-          <div class="w-foot">
-            <span class="mya-chip"><span class="material-symbols-outlined">cognition</span>Reviewed - please confirm</span>
-            <button class="btn-tonal" type="button">Review</button>
-          </div>
-        </section>
 
-        <!-- Searches to renew -->
-        <section class="card widget card--searches" data-widget-id="searches">
-          <div class="w-head">
-            <h2 class="w-title">Searches to follow-up</h2>
-            <span class="w-count">2</span>
-          </div>
-          <div class="card__scroll">
-            <ul class="search-list">
-              <li class="search-row">
-                <div class="search-row__main">
-                  <div class="search-row__top">
-                    <span class="date-pill date-pill--error">Expired 17 June 2026</span>
-                    <span class="search-row__days search-row__days--error">2 days ago</span>
-                  </div>
-                  <p class="search-row__name">Purchase of 14 Cedar Drive, Reading</p>
+          <!-- Step 2 — stacked result cards -->
+          <div class="aicard__results">
+            <div class="aicard__top">
+              <div class="aicard__head">
+                <div class="aicard__headleft">
+                  <ai-orb class="aicard__avatar" variant="communications"></ai-orb>
+                  <p class="aicard__title">Help with client relations</p>
                 </div>
-                <span class="os-badge">OS1</span>
-              </li>
-              <li class="search-row">
-                <div class="search-row__main">
-                  <div class="search-row__top">
-                    <span class="date-pill date-pill--warn">Expires 21 June 2026</span>
-                    <span class="search-row__days search-row__days--warn">2 days left</span>
-                  </div>
-                  <p class="search-row__name">Purchase 8 Bloomsbury Court</p>
+                <p class="aicard__count" data-count>1 of 5</p>
+                <button class="aicard__cycle" type="button" data-cycle aria-haspopup="true" aria-expanded="false" aria-label="Re-run this prompt on a schedule">
+                  <svg class="aicard__cycleglyph" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.53981 17.6079C5.09536 16.9412 3.92175 15.9343 3.01897 14.5871C2.1162 13.2398 1.66481 11.719 1.66481 10.0246C1.66481 9.66344 1.68217 9.30928 1.71689 8.96205C1.75161 8.61483 1.81064 8.27455 1.89397 7.94122L0.93564 8.50372L0.102307 7.06622L4.08147 4.77455L6.37314 8.73289L4.91481 9.56622L3.78981 7.60789C3.63703 7.98289 3.52245 8.37178 3.44606 8.77455C3.36967 9.17733 3.33147 9.594 3.33147 10.0246C3.33147 11.3718 3.69953 12.5975 4.43564 13.7016C5.17175 14.8058 6.15092 15.6218 7.37314 16.1496L6.53981 17.6079ZM12.9148 7.50372V5.83705H15.1856C14.5467 5.04539 13.7759 4.4308 12.8731 3.9933C11.9704 3.5558 11.012 3.33705 9.99814 3.33705C9.23425 3.33705 8.51203 3.45511 7.83147 3.69122C7.15092 3.92733 6.52592 4.26066 5.95647 4.69122L5.12314 3.23289C5.81758 2.74678 6.57453 2.36483 7.39397 2.08705C8.21342 1.80928 9.08147 1.67039 9.99814 1.67039C11.0954 1.67039 12.144 1.87525 13.144 2.28497C14.144 2.69469 15.0398 3.28844 15.8315 4.06622V2.92039H17.4981V7.50372H12.9148ZM12.3731 20.0037L8.39397 17.7121L10.6856 13.7537L12.1231 14.5871L10.9356 16.6287C12.5745 16.3926 13.9391 15.6496 15.0294 14.3996C16.1197 13.1496 16.6648 11.6843 16.6648 10.0037C16.6648 9.85094 16.6613 9.70858 16.6544 9.57664C16.6474 9.44469 16.6301 9.30928 16.6023 9.17039H18.2898C18.3037 9.30928 18.3141 9.44469 18.3211 9.57664C18.328 9.70858 18.3315 9.85094 18.3315 10.0037C18.3315 11.8787 17.7724 13.5558 16.6544 15.035C15.5363 16.5141 14.0815 17.5107 12.2898 18.0246L13.2065 18.5662L12.3731 20.0037Z" fill="currentColor"/></svg>
+                </button>
+              </div>
+              <div class="stack" data-stack></div>
+            </div>
+            <div class="aicard__foot">
+              <button class="textbtn" type="button" data-back>Back</button>
+              <button class="outlinebtn" type="button" data-action="open-relations">Review all</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Searches to follow-up -->
+        <section class="cell widget aicard" data-widget-id="searches" data-block="searches" data-assistant="operations communications" data-state="prompt">
+
+          <!-- Step 1 — pre-canned prompts -->
+          <div class="aicard__prompt">
+            <div class="aicard__head aicard__head--plain">
+              <div class="aicard__headleft">
+                <span class="aicard__avatars">
+            <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
+            <ai-orb class="aicard__avatar" variant="communications"></ai-orb>
+          </span>
+                <p class="aicard__title">Searches to follow-up</p>
+              </div>
+            </div>
+            <div class="aicard__promptbody">
+              <p class="aicard__label">Prompt to run an analysis or draft messages:</p>
+              <div class="prompts prompts--sm">
+                  <button class="pchip pchip--operations" type="button" data-prompt="0">
+                    <span class="pchip__text">Follow-up expired and expiring searches</span>
+                    <span class="pchip__tokens">~1.0k</span>
+                  </button>
+                  <button class="pchip pchip--communications" type="button" data-prompt="1">
+                    <span class="pchip__text">Draft follow-up messages for searches that contain anomalies</span>
+                    <span class="pchip__tokens">~1.3k</span>
+                  </button>
+                  <button class="pchip pchip--operations" type="button" data-prompt="2">
+                    <span class="pchip__text">Follow-up AP1 ready searches</span>
+                    <span class="pchip__tokens">~1.0k</span>
+                  </button>
+              </div>
+            </div>
+            <p class="aicard__loadtext">Thinking...</p>
+          </div>
+
+          <!-- Step 2 — stacked result cards -->
+          <div class="aicard__results">
+            <div class="aicard__top">
+              <div class="aicard__head">
+                <div class="aicard__headleft">
+                  <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
+                  <p class="aicard__title">Searches to follow-up</p>
                 </div>
-                <span class="os-badge">OS2</span>
-              </li>
-            </ul>
-          </div>
-          <div class="w-foot w-foot--end">
-            <button class="btn-tonal" type="button">Review</button>
+                <p class="aicard__count" data-count>1 of 6</p>
+                <button class="aicard__cycle" type="button" data-cycle aria-haspopup="true" aria-expanded="false" aria-label="Re-run this prompt on a schedule">
+                  <svg class="aicard__cycleglyph" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.53981 17.6079C5.09536 16.9412 3.92175 15.9343 3.01897 14.5871C2.1162 13.2398 1.66481 11.719 1.66481 10.0246C1.66481 9.66344 1.68217 9.30928 1.71689 8.96205C1.75161 8.61483 1.81064 8.27455 1.89397 7.94122L0.93564 8.50372L0.102307 7.06622L4.08147 4.77455L6.37314 8.73289L4.91481 9.56622L3.78981 7.60789C3.63703 7.98289 3.52245 8.37178 3.44606 8.77455C3.36967 9.17733 3.33147 9.594 3.33147 10.0246C3.33147 11.3718 3.69953 12.5975 4.43564 13.7016C5.17175 14.8058 6.15092 15.6218 7.37314 16.1496L6.53981 17.6079ZM12.9148 7.50372V5.83705H15.1856C14.5467 5.04539 13.7759 4.4308 12.8731 3.9933C11.9704 3.5558 11.012 3.33705 9.99814 3.33705C9.23425 3.33705 8.51203 3.45511 7.83147 3.69122C7.15092 3.92733 6.52592 4.26066 5.95647 4.69122L5.12314 3.23289C5.81758 2.74678 6.57453 2.36483 7.39397 2.08705C8.21342 1.80928 9.08147 1.67039 9.99814 1.67039C11.0954 1.67039 12.144 1.87525 13.144 2.28497C14.144 2.69469 15.0398 3.28844 15.8315 4.06622V2.92039H17.4981V7.50372H12.9148ZM12.3731 20.0037L8.39397 17.7121L10.6856 13.7537L12.1231 14.5871L10.9356 16.6287C12.5745 16.3926 13.9391 15.6496 15.0294 14.3996C16.1197 13.1496 16.6648 11.6843 16.6648 10.0037C16.6648 9.85094 16.6613 9.70858 16.6544 9.57664C16.6474 9.44469 16.6301 9.30928 16.6023 9.17039H18.2898C18.3037 9.30928 18.3141 9.44469 18.3211 9.57664C18.328 9.70858 18.3315 9.85094 18.3315 10.0037C18.3315 11.8787 17.7724 13.5558 16.6544 15.035C15.5363 16.5141 14.0815 17.5107 12.2898 18.0246L13.2065 18.5662L12.3731 20.0037Z" fill="currentColor"/></svg>
+                </button>
+              </div>
+              <div class="stack" data-stack></div>
+            </div>
+            <div class="aicard__foot">
+              <button class="textbtn" type="button" data-back>Back</button>
+              <button class="outlinebtn" type="button" data-action="open-searches">Review all</button>
+            </div>
           </div>
         </section>
 
-        <!-- Client relations -->
-        <section class="card widget card--relations" data-widget-id="client-relations">
-          <div class="w-head">
-            <h2 class="w-title">Client relations</h2>
-            <span class="w-count">2</span>
-          </div>
-          <div class="relations__scroll">
-            <div class="relation">
-              <div class="relation__chips">
-                <span class="chip"><span class="material-symbols-outlined">cognition</span>Declining tone</span>
-                <span class="confidence">Confidence <b>81%</b></span>
-              </div>
-              <div class="bubble bubble--error">
-                <div class="bubble__meta"><span>From: Ralph Yaw Tutu · A1445/179</span><span>6 days ago</span></div>
-                <p class="bubble__quote">"I'm still waiting to hear back."</p>
+        <!-- Matters to follow-up -->
+        <section class="cell widget aicard" data-widget-id="matters" data-block="matters" data-assistant="operations" data-state="prompt">
+
+          <!-- Step 1 — pre-canned prompts -->
+          <div class="aicard__prompt">
+            <div class="aicard__head aicard__head--plain">
+              <div class="aicard__headleft">
+                <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
+                <p class="aicard__title">Matters to follow-up</p>
               </div>
             </div>
-            <div class="relation">
-              <div class="relation__chips">
-                <span class="chip"><span class="material-symbols-outlined">cognition</span>Declining tone</span>
-                <span class="confidence">Confidence <b>76%</b></span>
-              </div>
-              <div class="bubble bubble--error">
-                <div class="bubble__meta"><span>From: David Pellow · F4801/1</span><span>6 days ago</span></div>
-                <p class="bubble__quote">Concern about cost and timescales raised twice this week.</p>
+            <div class="aicard__promptbody">
+              <p class="aicard__label">Prompt to run an analysis:</p>
+              <div class="prompts prompts--sm">
+                  <button class="pchip pchip--operations" type="button" data-prompt="0">
+                    <span class="pchip__text">List all matters ready to close</span>
+                    <span class="pchip__tokens">~1.1k</span>
+                  </button>
+                  <button class="pchip pchip--operations" type="button" data-prompt="1">
+                    <span class="pchip__text">Flag matters with a remaining balance</span>
+                    <span class="pchip__tokens">~0.9k</span>
+                  </button>
               </div>
             </div>
+            <p class="aicard__loadtext">Thinking...</p>
           </div>
-          <div class="w-foot">
-            <span class="mya-chip"><span class="material-symbols-outlined">cognition</span>Reviewed - please confirm</span>
-            <button class="btn-tonal" type="button">Review</button>
+
+          <!-- Step 2 — stacked result cards -->
+          <div class="aicard__results">
+            <div class="aicard__top">
+              <div class="aicard__head">
+                <div class="aicard__headleft">
+                  <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
+                  <p class="aicard__title">Matters to follow-up</p>
+                </div>
+                <p class="aicard__count" data-count>1 of 7</p>
+                <button class="aicard__cycle" type="button" data-cycle aria-haspopup="true" aria-expanded="false" aria-label="Re-run this prompt on a schedule">
+                  <svg class="aicard__cycleglyph" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.53981 17.6079C5.09536 16.9412 3.92175 15.9343 3.01897 14.5871C2.1162 13.2398 1.66481 11.719 1.66481 10.0246C1.66481 9.66344 1.68217 9.30928 1.71689 8.96205C1.75161 8.61483 1.81064 8.27455 1.89397 7.94122L0.93564 8.50372L0.102307 7.06622L4.08147 4.77455L6.37314 8.73289L4.91481 9.56622L3.78981 7.60789C3.63703 7.98289 3.52245 8.37178 3.44606 8.77455C3.36967 9.17733 3.33147 9.594 3.33147 10.0246C3.33147 11.3718 3.69953 12.5975 4.43564 13.7016C5.17175 14.8058 6.15092 15.6218 7.37314 16.1496L6.53981 17.6079ZM12.9148 7.50372V5.83705H15.1856C14.5467 5.04539 13.7759 4.4308 12.8731 3.9933C11.9704 3.5558 11.012 3.33705 9.99814 3.33705C9.23425 3.33705 8.51203 3.45511 7.83147 3.69122C7.15092 3.92733 6.52592 4.26066 5.95647 4.69122L5.12314 3.23289C5.81758 2.74678 6.57453 2.36483 7.39397 2.08705C8.21342 1.80928 9.08147 1.67039 9.99814 1.67039C11.0954 1.67039 12.144 1.87525 13.144 2.28497C14.144 2.69469 15.0398 3.28844 15.8315 4.06622V2.92039H17.4981V7.50372H12.9148ZM12.3731 20.0037L8.39397 17.7121L10.6856 13.7537L12.1231 14.5871L10.9356 16.6287C12.5745 16.3926 13.9391 15.6496 15.0294 14.3996C16.1197 13.1496 16.6648 11.6843 16.6648 10.0037C16.6648 9.85094 16.6613 9.70858 16.6544 9.57664C16.6474 9.44469 16.6301 9.30928 16.6023 9.17039H18.2898C18.3037 9.30928 18.3141 9.44469 18.3211 9.57664C18.328 9.70858 18.3315 9.85094 18.3315 10.0037C18.3315 11.8787 17.7724 13.5558 16.6544 15.035C15.5363 16.5141 14.0815 17.5107 12.2898 18.0246L13.2065 18.5662L12.3731 20.0037Z" fill="currentColor"/></svg>
+                </button>
+              </div>
+              <div class="stack" data-stack></div>
+            </div>
+            <div class="aicard__foot">
+              <button class="textbtn" type="button" data-back>Back</button>
+              <button class="outlinebtn" type="button" data-action="open-matters">Review all</button>
+            </div>
           </div>
         </section>
 
-        <!-- AML Checks to complete -->
-        <section class="card widget" data-widget-id="aml-checks">
-          <div class="w-head">
-            <h2 class="w-title">AML Checks to complete</h2>
-            <span class="w-count">2</span>
-          </div>
-          <div class="card__scroll">
-            <div class="aml-card">
-              <p class="aml-card__sub">Bicester Land Co Ltd · Opened 9 days ago</p>
-              <p class="aml-card__title">Land Promotion Agreement, Launton · H6533/1</p>
-              <div class="aml-card__chips">
-                <span class="aml-chip">ID Verification</span>
-                <span class="aml-chip">Source of funds</span>
+        <!-- AML Checks -->
+        <section class="cell widget aicard" data-widget-id="aml" data-block="aml" data-assistant="operations finance" data-state="prompt">
+
+          <!-- Step 1 — pre-canned prompts -->
+          <div class="aicard__prompt">
+            <div class="aicard__head aicard__head--plain">
+              <div class="aicard__headleft">
+                <span class="aicard__avatars">
+            <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
+            <ai-orb class="aicard__avatar" variant="finance"></ai-orb>
+          </span>
+                <p class="aicard__title">AML Checks</p>
               </div>
             </div>
-            <div class="aml-card">
-              <p class="aml-card__sub">Jonathan Reece · Opened 4 days ago</p>
-              <p class="aml-card__title">Purchase 8 Bloomsbury Court · A25/1</p>
-              <div class="aml-card__chips">
-                <span class="aml-chip">Source of funds</span>
+            <div class="aicard__promptbody">
+              <p class="aicard__label">Prompt to run an analysis:</p>
+              <div class="prompts prompts--sm">
+                  <button class="pchip pchip--operations" type="button" data-prompt="0">
+                    <span class="pchip__text">Which AML checks are outstanding?</span>
+                    <span class="pchip__tokens">~0.8k</span>
+                  </button>
+                  <button class="pchip pchip--finance" type="button" data-prompt="1">
+                    <span class="pchip__text">Show me who still requires proof of source-of-funds to be checked</span>
+                    <span class="pchip__tokens">~2.1k</span>
+                  </button>
               </div>
             </div>
+            <p class="aicard__loadtext">Thinking...</p>
           </div>
-          <div class="w-foot">
-            <span class="mya-chip"><span class="material-symbols-outlined">cognition</span>Reviewed - please confirm</span>
-            <button class="btn-tonal" type="button">Review</button>
+
+          <!-- Step 2 — stacked result cards -->
+          <div class="aicard__results">
+            <div class="aicard__top">
+              <div class="aicard__head">
+                <div class="aicard__headleft">
+                  <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
+                  <p class="aicard__title">AML Checks</p>
+                </div>
+                <p class="aicard__count" data-count>1 of 6</p>
+                <button class="aicard__cycle" type="button" data-cycle aria-haspopup="true" aria-expanded="false" aria-label="Re-run this prompt on a schedule">
+                  <svg class="aicard__cycleglyph" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.53981 17.6079C5.09536 16.9412 3.92175 15.9343 3.01897 14.5871C2.1162 13.2398 1.66481 11.719 1.66481 10.0246C1.66481 9.66344 1.68217 9.30928 1.71689 8.96205C1.75161 8.61483 1.81064 8.27455 1.89397 7.94122L0.93564 8.50372L0.102307 7.06622L4.08147 4.77455L6.37314 8.73289L4.91481 9.56622L3.78981 7.60789C3.63703 7.98289 3.52245 8.37178 3.44606 8.77455C3.36967 9.17733 3.33147 9.594 3.33147 10.0246C3.33147 11.3718 3.69953 12.5975 4.43564 13.7016C5.17175 14.8058 6.15092 15.6218 7.37314 16.1496L6.53981 17.6079ZM12.9148 7.50372V5.83705H15.1856C14.5467 5.04539 13.7759 4.4308 12.8731 3.9933C11.9704 3.5558 11.012 3.33705 9.99814 3.33705C9.23425 3.33705 8.51203 3.45511 7.83147 3.69122C7.15092 3.92733 6.52592 4.26066 5.95647 4.69122L5.12314 3.23289C5.81758 2.74678 6.57453 2.36483 7.39397 2.08705C8.21342 1.80928 9.08147 1.67039 9.99814 1.67039C11.0954 1.67039 12.144 1.87525 13.144 2.28497C14.144 2.69469 15.0398 3.28844 15.8315 4.06622V2.92039H17.4981V7.50372H12.9148ZM12.3731 20.0037L8.39397 17.7121L10.6856 13.7537L12.1231 14.5871L10.9356 16.6287C12.5745 16.3926 13.9391 15.6496 15.0294 14.3996C16.1197 13.1496 16.6648 11.6843 16.6648 10.0037C16.6648 9.85094 16.6613 9.70858 16.6544 9.57664C16.6474 9.44469 16.6301 9.30928 16.6023 9.17039H18.2898C18.3037 9.30928 18.3141 9.44469 18.3211 9.57664C18.328 9.70858 18.3315 9.85094 18.3315 10.0037C18.3315 11.8787 17.7724 13.5558 16.6544 15.035C15.5363 16.5141 14.0815 17.5107 12.2898 18.0246L13.2065 18.5662L12.3731 20.0037Z" fill="currentColor"/></svg>
+                </button>
+              </div>
+              <div class="stack" data-stack></div>
+            </div>
+            <div class="aicard__foot">
+              <button class="textbtn" type="button" data-back>Back</button>
+              <button class="outlinebtn" type="button" data-action="open-aml">Review all</button>
+            </div>
           </div>
         </section>
 
-        <!-- Bills & Payments -->
-        <section class="card widget card--chart" data-widget-id="cashflow">
-          <div class="w-head w-head--plain"><h2 class="w-title">Bills &amp; Payments</h2></div>
+        <!-- Bills & payments -->
+        <section class="cell widget cell--chart" data-widget-id="cashflow">
+          <div class="cellhead"><p class="cellhead__title">Bills &amp; payments</p></div>
           <div class="chart">
             <div class="chart__legend">
               <span class="legend"><i class="legend__dot legend__dot--bills"></i>Bills</span>
               <span class="legend"><i class="legend__dot legend__dot--pay"></i>Payments</span>
             </div>
             <div class="chart__plot">
-              <div class="chart__grid">
-                <div class="grid-line"><span>£30k</span></div>
-                <div class="grid-line"><span>£20k</span></div>
-                <div class="grid-line"><span>£10k</span></div>
-                <div class="grid-line"><span>£0</span></div>
+              <div class="chart__axis">
+                <span style="top:0">£30k</span>
+                <span style="top:33px">£20k</span>
+                <span style="top:67px">£10k</span>
+                <span style="top:104px">£0</span>
               </div>
-              <div class="chart__bars" id="chartBars"></div>
+              <div class="chart__grid">
+                <i style="top:0"></i><i style="top:33px"></i><i style="top:67px"></i><i style="top:104px"></i>
+              </div>
+              <div class="chart__bars" id="chartBarsNew"></div>
             </div>
-          </div>
-          <div class="figures">
-            <div class="figure">
-              <span class="figure__label">Bills</span>
-              <span class="figure__value">£120,613</span>
-            </div>
-            <div class="figure">
-              <span class="figure__label">Payments</span>
-              <span class="figure__value">£78,207</span>
-            </div>
-            <div class="figure">
-              <span class="figure__label">Balance</span>
-              <span class="figure__value figure__value--neg">-£42,594</span>
+            <div class="chart__figures">
+              <div class="figure"><span class="figure__label">Bills</span><span class="figure__value">£120,613</span></div>
+              <div class="figure"><span class="figure__label">Payments</span><span class="figure__value">£78,207</span></div>
+              <div class="figure"><span class="figure__label">Balance</span><span class="figure__value figure__value--neg">-£42,594</span></div>
             </div>
           </div>
         </section>
 
         <!-- PAF Deadline -->
-        <section class="card widget card--paf" data-widget-id="paf">
-          <div class="w-head w-head--plain"><h2 class="w-title">PAF Deadline</h2></div>
-          <div class="paf__pie"></div>
-          <div class="paf__timer">
-            <span class="paf__time" id="pafTimer"><b>01:50</b><i>:56</i></span>
-            <span class="paf__caption">3pm weekdays</span>
+        <section class="cell widget cell--paf" data-widget-id="paf">
+          <div class="cellhead"><p class="cellhead__title">PAF Deadline</p></div>
+          <img class="paf__ring" src="assets/paf-ring.svg" alt="" />
+          <div class="paf__readout">
+            <p class="paf__time" id="pafTimerNew"><b>01:50</b><i>:56</i></p>
+            <p class="paf__caption">3pm weekdays</p>
           </div>
         </section>
 
-        <!-- Recent Matters -->
-        <section class="card widget card--recent" data-widget-id="recent-matters">
-          <div class="w-head w-head--plain"><h2 class="w-title">Recent Matters</h2></div>
-          <div class="recent__scroll">
-            <div class="recent-row">
-              <div class="recent-row__main">
-                <div class="recent-row__meta"><span class="recent-row__code">A1/1</span><span class="recent-row__name">Mr Mohamed Alshebani</span></div>
-                <p class="recent-row__title">Purchase of 14 Cedar Drive, Reading</p>
-              </div>
-              <span class="status status--open"><i></i>Open</span>
-            </div>
-            <div class="recent-row">
-              <div class="recent-row__main">
-                <div class="recent-row__meta"><span class="recent-row__code">A8/7</span><span class="recent-row__name">Mr Mark Appleton</span></div>
-                <p class="recent-row__title">Dispute with Mrs Macrina Martin</p>
-              </div>
-              <span class="status status--closed"><i></i>Closed</span>
-            </div>
-            <div class="recent-row">
-              <div class="recent-row__main">
-                <div class="recent-row__meta"><span class="recent-row__code">A569/2</span><span class="recent-row__name">Mr Daniel Peter Ames</span></div>
-                <p class="recent-row__title">S/O 23A Russell Road Gravesend Kent DA12 2RT</p>
-              </div>
-              <span class="status status--closed"><i></i>Closed</span>
-            </div>
-            <div class="recent-row">
-              <div class="recent-row__main">
-                <div class="recent-row__meta"><span class="recent-row__code">10012/1</span><span class="recent-row__name">1221 CAPITAL LTD</span></div>
-                <p class="recent-row__title">Refinance of 1221 Capital portfolio</p>
-              </div>
-              <span class="status status--open"><i></i>Open</span>
-            </div>
-            <div class="recent-row">
-              <div class="recent-row__main">
-                <div class="recent-row__meta"><span class="recent-row__code">B4471/2</span><span class="recent-row__name">Mrs Helen Cartwright</span></div>
-                <p class="recent-row__title">Purchase of 5 Meadow Rise, Bicester</p>
-              </div>
-              <span class="status status--open"><i></i>Open</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- Upcoming Activities / Recent Documents -->
-        <section class="card widget card--tabs" data-widget-id="activities" data-tabs>
-          <div class="tabs">
-            <button class="tab tab--active" data-tab="activities">Upcoming Activities</button>
-            <button class="tab" data-tab="documents">Recent Documents</button>
-          </div>
-          <div class="tab-panel" data-panel="activities">
-            <p class="empty-note">No upcoming activites</p>
-          </div>
-          <div class="tab-panel" data-panel="documents" hidden>
-            <p class="empty-note">No recent documents</p>
-          </div>
+        <!-- Upcoming activities -->
+        <section class="cell widget cell--note" data-widget-id="activities">
+          <div class="cellhead cellhead--tight"><p class="cellhead__title">Upcoming activities</p></div>
+          <p class="cellnote">There are currently no upcoming activities</p>
         </section>
 
         <!-- Recent PAFs -->
-        <section class="card widget card--table" data-widget-id="recent-pafs">
-          <div class="w-head w-head--plain"><h2 class="w-title">Recent PAFs</h2></div>
-          <p class="too-small">This block is too small to preview Recent PAFs please increase the size of the block to continue</p>
-          <div class="wide-content">
-            <div class="toolbar">
-              <div class="toolbar__group">
-                <div class="search-field">
-                  <span class="material-symbols-outlined">search</span>
-                  <input type="text" placeholder="Search PAFs" />
-                </div>
-                <button class="icon-btn" aria-label="Filter">
-                  <span class="material-symbols-outlined">filter_alt</span>
-                </button>
-              </div>
-              <label class="select-field">
-                <span class="select-field__label">Status</span>
-                <select>
-                  <option>In Progress</option>
-                  <option>Completed</option>
-                  <option>All</option>
-                </select>
-                <span class="material-symbols-outlined select-field__arrow">keyboard_arrow_down</span>
-              </label>
-            </div>
-            <div class="table-scroll">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Matter</th>
-                    <th>Matter Description</th>
-                    <th>Fee Earner</th>
-                    <th>Postal Method</th>
-                    <th class="ta-c">Email</th>
-                    <th class="ta-c">Fax</th>
-                    <th>Created</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>C21984/1</td>
-                    <td>Sale of 113 Riseborough Walk, Nottingham, NG6 8DR</td>
-                    <td>Christina Coleman</td>
-                    <td>First Class Royal Mail</td>
-                    <td class="ta-c"><span class="material-symbols-outlined check">check</span></td>
-                    <td class="ta-c"></td>
-                    <td>26/05/2026, 15:24</td>
-                  </tr>
-                  <tr>
-                    <td>W7052/2</td>
-                    <td>Sale of 38 Birks Road Cleator Moor CA25 5HS</td>
-                    <td>Sarah Gillbe</td>
-                    <td>First Class Royal Mail</td>
-                    <td class="ta-c"></td>
-                    <td class="ta-c"></td>
-                    <td>26/05/2026, 16:23</td>
-                  </tr>
-                  <tr>
-                    <td>B17693/1</td>
-                    <td>Sale of 30 Granville Street Willenhall Walsall WV13 1DN</td>
-                    <td>Sarah Gillbe</td>
-                    <td>First Class Royal Mail</td>
-                    <td class="ta-c"><span class="material-symbols-outlined check">check</span></td>
-                    <td class="ta-c"></td>
-                    <td>26/05/2026, 15:35</td>
-                  </tr>
-                  <tr>
-                    <td>H12664/1</td>
-                    <td>Transfer of Equity of 18 Greenwood Avenue Hucknall N…</td>
-                    <td>Christina Coleman</td>
-                    <td>First Class Royal Mail</td>
-                    <td class="ta-c"><span class="material-symbols-outlined check">check</span></td>
-                    <td class="ta-c"></td>
-                    <td>27/05/2026, 07:31</td>
-                  </tr>
-                  <tr>
-                    <td>W17407/1</td>
-                    <td>Purchase of Plot 90 Netherhall Gardens - 23 Kinloch R…</td>
-                    <td>Stacey Bell</td>
-                    <td>First Class Royal Mail</td>
-                    <td class="ta-c"></td>
-                    <td class="ta-c"></td>
-                    <td>27/05/2026, 08:13</td>
-                  </tr>
-                  <tr>
-                    <td>J5034/3</td>
-                    <td>Remortgage and Transfer of Equity - Flat 4, 41 Athenlay</td>
-                    <td>Eva Daboh</td>
-                    <td>Special Delivery 1pm</td>
-                    <td class="ta-c"></td>
-                    <td class="ta-c"></td>
-                    <td>22/05/2026, 06:53</td>
-                  </tr>
-                  <tr>
-                    <td>Z691/1</td>
-                    <td>Sale of 67 Albert Drive, London, SW19 6LB</td>
-                    <td>Emily Frank</td>
-                    <td>First Class Royal Mail</td>
-                    <td class="ta-c"></td>
-                    <td class="ta-c"><span class="material-symbols-outlined check">check</span></td>
-                    <td>26/05/2026, 16:46</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+        <section class="cell widget cell--note" data-widget-id="recent-pafs">
+          <div class="cellhead"><p class="cellhead__title">Recent PAFs</p></div>
+          <p class="cellnote">This block is too small to preview Recent PAFs please increase the size of the block to continue</p>
         </section>
 
-        <!-- Time Recordings -->
-        <section class="card widget card--table" data-widget-id="time-recordings">
-          <div class="w-head w-head--plain"><h2 class="w-title">Time Recordings</h2></div>
-          <p class="too-small">This block is too small to preview Time Recordings please increase the size of the block to continue</p>
-          <div class="wide-content">
-            <div class="toolbar">
-              <div class="toolbar__group">
-                <label class="select-field">
-                  <span class="select-field__label">Date</span>
-                  <input type="text" value="27/05/2026" />
-                  <span class="material-symbols-outlined select-field__arrow">calendar_month</span>
-                </label>
-                <button class="btn">Submit</button>
-              </div>
-              <div class="toolbar__group">
-                <div class="search-field">
-                  <span class="material-symbols-outlined">search</span>
-                  <input type="text" placeholder="Search Time Recordings" />
-                </div>
-                <button class="icon-btn" aria-label="Filter">
-                  <span class="material-symbols-outlined">filter_alt</span>
-                </button>
-              </div>
-            </div>
-            <div class="table-scroll">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Matter</th>
-                    <th>Matter Description</th>
-                    <th>Fee Earner</th>
-                    <th>Description</th>
-                    <th>Note</th>
-                    <th>Task Type</th>
-                    <th>Units</th>
-                    <th>Rate</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>A6072/1</td><td>Naomi Anderson - Cli…</td><td>Meera Tailor</td>
-                    <td>Email out to client re…</td><td></td><td>Email out</td>
-                    <td class="muted">1</td><td>29.40</td><td>29.40</td>
-                    <td><span class="status-badge"><i></i>Unbilled</span></td>
-                  </tr>
-                  <tr>
-                    <td>B17107/2</td><td>Advising you as to de…</td><td>Tom Donnelly</td>
-                    <td>Email out - client on l…</td><td></td><td>Email out</td>
-                    <td class="muted">1</td><td>22.50</td><td>22.50</td>
-                    <td><span class="status-badge"><i></i>Unbilled</span></td>
-                  </tr>
-                  <tr>
-                    <td>H13987/1</td><td>Child Arrangements/…</td><td>Sally Wood</td>
-                    <td>Email in from client -…</td><td></td><td>Email in</td>
-                    <td class="muted">1</td><td>12.00</td><td>12.00</td>
-                    <td><span class="status-badge"><i></i>Unbilled</span></td>
-                  </tr>
-                  <tr>
-                    <td>M23461/1</td><td>CCJ removal</td><td>Paul Severs</td>
-                    <td>Email out - - RE: Ter…</td><td></td><td>Email out</td>
-                    <td class="muted">1</td><td>30.00</td><td>30.00</td>
-                    <td><span class="status-badge"><i></i>Unbilled</span></td>
-                  </tr>
-                  <tr>
-                    <td>C13246/1</td><td>Negotiate a financial…</td><td>Sally Wood</td>
-                    <td>Email out to other par…</td><td></td><td>Email out</td>
-                    <td class="muted">1</td><td>25.00</td><td>25.00</td>
-                    <td><span class="status-badge"><i></i>Unbilled</span></td>
-                  </tr>
-                  <tr>
-                    <td>S17637/1</td><td>Miss Amy Louise She…</td><td>Meera Tailor</td>
-                    <td>Email out to Markel c…</td><td></td><td><a href="#" class="link">Email out</a></td>
-                    <td class="muted">1</td><td>29.40</td><td>29.40</td>
-                    <td><span class="status-badge"><i></i>Unbilled</span></td>
-                  </tr>
-                  <tr>
-                    <td>B16595/1</td><td>CCJ removal</td><td>Paul Severs</td>
-                    <td>Email out - - RE: Surv…</td><td></td><td><a href="#" class="link">Email out</a></td>
-                    <td class="muted">1</td><td>30.00</td><td>30.00</td>
-                    <td><span class="status-badge"><i></i>Unbilled</span></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+        <!-- Time recordings -->
+        <section class="cell widget cell--note" data-widget-id="time-recordings">
+          <div class="cellhead"><p class="cellhead__title">Time recordings</p></div>
+          <p class="cellnote">This block is too small to preview Time recordings please increase the size of the block to continue</p>
         </section>
 
-      </div><!-- /.widget-grid -->
+        <!-- Empty slot -->
+        <section class="cell cell--empty"></section>
+
+      </div>
     </main>
   </div>
 
@@ -676,31 +568,6 @@
     </div>
   </aside>
 
-  <!-- ===================== REVIEW CLIENT RELATIONS MODAL ===================== -->
-  <div class="modal-scrim" id="relScrim" hidden>
-    <div class="modal modal--relations" role="dialog" aria-modal="true" aria-labelledby="relTitle">
-      <header class="modal__head">
-        <h2 class="modal__title" id="relTitle">Review Client Relations</h2>
-        <span class="modal__status acc-status" id="relStatus" hidden></span>
-        <button class="modal__close" id="relClose" type="button" aria-label="Close">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </header>
-      <div class="modal__body" id="relBody"></div>
-      <footer class="modal__foot">
-        <div class="rate">
-          <span class="rate__icons">
-            <button class="rate__btn" type="button" aria-label="Rate down"><span class="material-symbols-outlined">thumb_down</span></button>
-            <button class="rate__btn" type="button" aria-label="Rate up"><span class="material-symbols-outlined">thumb_up</span></button>
-          </span>
-          <span class="rate__text">How accurate was Mya?<br>Rate our assessment, improve the Ai</span>
-        </div>
-        <div class="modal__actions">
-          <button class="btn-outline" id="relCloseBtn" type="button">Close</button>
-        </div>
-      </footer>
-    </div>
-  </div>
 
   <!-- ===================== DRAFT REPLY MODAL ===================== -->
   <div class="modal-scrim modal-scrim--reply" id="replyScrim" hidden>
@@ -718,7 +585,7 @@
             <button class="rate__btn" type="button" aria-label="Rate down"><span class="material-symbols-outlined">thumb_down</span></button>
             <button class="rate__btn" type="button" aria-label="Rate up"><span class="material-symbols-outlined">thumb_up</span></button>
           </span>
-          <span class="rate__text">How accurate was Mya?<br>Rate our assessment, improve the Ai</span>
+          <span class="rate__text">How accurate was this?<br>Rate our assessment, improve the Ai</span>
         </div>
         <div class="modal__actions">
           <button class="btn-outline" id="replyCancel" type="button">Close</button>
@@ -728,140 +595,8 @@
     </div>
   </div>
 
+  <script src="assets/ai-orb.js"></script>
   <script src="script.js"></script>
-
-  <!-- Animated gradient background (FireCMS Neat, loaded from an ESM CDN) -->
-  <script type="module">
-    const config = {
-      colors: [
-        { color: '#BEF0FF', enabled: true },
-        { color: '#FFFFFF', enabled: true },
-        { color: '#B8E8F9', enabled: false },
-        { color: '#37B5D6', enabled: false },
-        { color: '#FFFFFF', enabled: false },
-        { color: '#A8E6CF', enabled: false },
-      ],
-      speed: 5,
-      horizontalPressure: 4,
-      verticalPressure: 3,
-      waveFrequencyX: 0,
-      waveFrequencyY: 0,
-      waveAmplitude: 0,
-      shadows: 2,
-      highlights: 5,
-      colorBrightness: 1,
-      colorSaturation: 0,
-      wireframe: false,
-      colorBlending: 5,
-      backgroundColor: '#FFFFFF',
-      backgroundAlpha: 1,
-      grainScale: 0,
-      grainSparsity: 0,
-      grainIntensity: 0,
-      grainSpeed: 0,
-      resolution: 0.5,
-      yOffset: 4980,
-      yOffsetWaveMultiplier: 2,
-      yOffsetColorMultiplier: 2.3,
-      yOffsetFlowMultiplier: 1.2,
-      flowDistortionA: 0,
-      flowDistortionB: 0,
-      flowScale: 1,
-      flowEase: 0,
-      flowEnabled: false,
-      enableProceduralTexture: false,
-      transparentTextureVoid: false,
-      textureVoidLikelihood: 0.45,
-      textureVoidWidthMin: 200,
-      textureVoidWidthMax: 486,
-      textureBandDensity: 2.15,
-      textureColorBlending: 0.01,
-      textureSeed: 333,
-      textureEase: 0.75,
-      proceduralBackgroundColor: '#000000',
-      textureShapeTriangles: 20,
-      textureShapeCircles: 15,
-      textureShapeBars: 15,
-      textureShapeSquiggles: 10,
-      domainWarpEnabled: false,
-      domainWarpIntensity: 0,
-      domainWarpScale: 3,
-      vignetteIntensity: 0,
-      vignetteRadius: 0.8,
-      fresnelEnabled: false,
-      fresnelPower: 2,
-      fresnelIntensity: 0.5,
-      fresnelColor: '#FFFFFF',
-      iridescenceEnabled: false,
-      iridescenceIntensity: 0.5,
-      iridescenceSpeed: 1,
-      bloomIntensity: 0,
-      bloomThreshold: 0.7,
-      chromaticAberration: 0,
-      shapeType: 'plane',
-      shapeRotationX: 0,
-      shapeRotationY: 0,
-      shapeRotationZ: 0,
-      shapeAutoRotateSpeedX: 0,
-      shapeAutoRotateSpeedY: 0,
-      sphereRadius: 15,
-      torusRadius: 15,
-      torusTube: 5,
-      cylinderRadius: 10,
-      cylinderHeight: 40,
-      planeBend: 0,
-      planeTwist: 0,
-      silhouetteFade: 0.25,
-      cylinderFade: 0.08,
-      ribbonFade: 0.05,
-      flatShading: true,
-      cameraLock: true,
-      cameraX: 0,
-      cameraY: 0,
-      cameraZ: 0,
-      cameraRotationX: 0,
-      cameraRotationY: 0,
-      cameraRotationZ: 0,
-      cameraZoom: 1,
-    };
-
-    // Load the Neat library at runtime via a *dynamic* import. A static
-    // top-level import is a single point of failure — if the CDN stalls or is
-    // blocked, the whole module dies silently and uncatchably. Dynamic import
-    // lets us catch failures and fall back to a second CDN before giving up
-    // (in which case the CSS wash on .content stays visible).
-    const NEAT_SOURCES = [
-      "https://esm.sh/@firecms/neat@1.0.1",
-      "https://cdn.jsdelivr.net/npm/@firecms/neat@1.0.1/+esm",
-    ];
-    async function loadNeatGradient() {
-      for (const url of NEAT_SOURCES) {
-        try {
-          const mod = await import(url);
-          if (mod && mod.NeatGradient) return mod.NeatGradient;
-        } catch (e) {
-          console.warn("Neat gradient: failed to load from " + url, e);
-        }
-      }
-      return null;
-    }
-
-    (async () => {
-      const canvas = document.getElementById("gradient");
-      if (!canvas) return;
-      const NeatGradient = await loadNeatGradient();
-      if (!NeatGradient) {
-        console.warn("Neat gradient unavailable — using the CSS fallback background.");
-        return;
-      }
-      try {
-        const gradient = new NeatGradient({ ref: canvas, ...config });
-        // Subtle parallax: shift the gradient as the page scrolls.
-        window.addEventListener("scroll", () => { gradient.yOffset = 4980 + window.scrollY; }, { passive: true });
-      } catch (e) {
-        console.warn("Neat gradient failed to initialise:", e);
-      }
-    })();
-  </script>
+  <script src="dashboard.js"></script>
 </body>
 </html>

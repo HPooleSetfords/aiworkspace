@@ -2,6 +2,12 @@
    Halo — Dashboard interactions
    ============================================================ */
 
+/* Shared registry. Each review flow publishes its item array here so the
+   Intelligent Dashboard's AI cards (dashboard.js) can render the same records
+   the modals work on — one source of truth, and the ids line up so a card can
+   open its modal focused on a single item. */
+const HALO = (window.HALO = { relations: [], replies: [], searches: [], matters: [], aml: [], searchMessages: [] });
+
 /* ---- Bills & Payments bar chart ----
    Bar heights are expressed as a percentage of the £0–£30k plot height so the
    chart scales fluidly with the widget's column width (the plot height is fixed
@@ -99,51 +105,71 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
    - Layout persisted to localStorage
    ============================================================ */
 (function dashboardEditor() {
-  // Width model: a 6-column grid. A card's width (cspan) is one of these track
-  // counts — a third / half / two-thirds / full width. Each card owns its width,
-  // so resizing one never resizes a neighbour (they just reflow).
-  const COLS = 6;
-  const CSPANS = [2, 3, 4, 6];            // ⅓, ½, ⅔, full
-  const DEFAULT_CSPAN = 2;                // ⅓ → three per row by default
-  const ROWS_MAX = 6;                     // a card can be 1–6 rows (332px each) tall
+  // Width model: a 12-column grid. A card's width (cspan) is one of these track
+  // counts — a quarter / third / half / two-thirds / full width. Each card owns
+  // its width, so resizing one never resizes a neighbour (they just reflow).
+  //
+  // cspan 0 means "auto": the card hasn't been resized, so it follows the
+  // responsive default in CSS (--cspan-auto: ⅓ normally, ¼ on wide desktops,
+  // ½ on tablets, full on mobile). Resizing a card, or setting its row's column
+  // count in the Re-order drawer, pins a concrete width instead.
+  const COLS = 12;
+  const AUTO = 0;
+  const CSPANS = [3, 4, 6, 8, 12];        // ¼, ⅓, ½, ⅔, full
+  const DEFAULT_CSPAN = 4;                // ⅓ → three per row
+  const ROWS_MAX = 6;                     // a card can be 1–6 rows (328px each) tall
 
   // The Re-order drawer works in a row model (columns per row + split); these
   // helpers convert between that and the per-card widths the grid uses.
-  const ALLOWED_COLS = [1, 2, 3];
+  const ALLOWED_COLS = [1, 2, 3, 4];
   const DEFAULT_COLS = 3;
   const SPLITS = ["30/70", "50/50", "70/30"];
   const DEFAULT_SPLIT = "50/50";
-  const STORAGE_KEY = "halo-dashboard-layout-v9";
+  const STORAGE_KEY = "halo-dashboard-layout-v10";
+
+  // The tracks an AUTO card currently occupies — CSS owns this, and it changes
+  // with the breakpoint (⅓ normally, ¼ on wide desktops).
+  function autoSpan() {
+    if (!grid) return DEFAULT_CSPAN;
+    const v = parseInt(getComputedStyle(grid).getPropertyValue("--cspan-auto"), 10);
+    return CSPANS.includes(v) ? v : DEFAULT_CSPAN;
+  }
+  // Resolve a stored span (which may be AUTO) to the tracks it occupies.
+  function spanOf(v) { return CSPANS.includes(v) ? v : autoSpan(); }
 
   // Preview column template for a row (drawer only).
   function templateFor(cols, split) {
     if (cols === 1) return "1fr";
+    if (cols >= 4) return "1fr 1fr 1fr 1fr";
     if (cols === 3) return "1fr 1fr 1fr";
     if (split === "30/70") return "3fr 7fr";
     if (split === "70/30") return "7fr 3fr";
     return "1fr 1fr";
   }
-  // Per-card widths (6-col tracks) for a row's column count + split.
+  // Per-card widths (12-col tracks) for a row's column count + split.
   function widthsForRow(cols, split) {
-    if (cols === 1) return [6];
-    if (cols >= 3) return [2, 2, 2];
-    if (split === "30/70") return [2, 4];
-    if (split === "70/30") return [4, 2];
-    return [3, 3];                         // 50/50
+    if (cols === 1) return [12];
+    if (cols >= 4) return [3, 3, 3, 3];
+    if (cols === 3) return [4, 4, 4];
+    if (split === "30/70") return [4, 8];
+    if (split === "70/30") return [8, 4];
+    return [6, 6];                         // 50/50
   }
   function splitOf(a, b) { return a < b ? "30/70" : (a > b ? "70/30" : "50/50"); }
-  // Snap a track count to the nearest valid width: ⅓, ½, ⅔ or full. Dragging can
-  // land on ½ (so you can build a 50/50 row), but a ½ that doesn't pair with
+  // Snap a track count to the nearest valid width: ¼, ⅓, ½, ⅔ or full. Dragging
+  // can land on ½ (so you can build a 50/50 row); a ½ that doesn't pair with
   // another ½ is normalised to ⅔ on Save (see normalizeLayout).
   function snapCspan(tracks) {
-    return tracks <= 2 ? 2 : (tracks === 3 ? 3 : (tracks <= 5 ? 4 : 6));
+    let best = CSPANS[0];
+    CSPANS.forEach((c) => { if (Math.abs(c - tracks) < Math.abs(best - tracks)) best = c; });
+    return best;
   }
   // Pack an ordered id list into rows (each ≤ 6 tracks) from per-card widths.
   function packRows(order, widths) {
     const rows = [];
     let cur = [], used = 0;
     order.forEach((id) => {
-      const w = CSPANS.includes(widths[id]) ? widths[id] : DEFAULT_CSPAN;
+      const w = spanOf(widths[id]);
       if (used + w > COLS && cur.length) { rows.push(cur); cur = []; used = 0; }
       cur.push(id); used += w;
     });
@@ -153,8 +179,9 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
   // Row config (cols + split) implied by a group of cards' current widths.
   function rowCfgOf(ids, widths) {
     if (ids.length <= 1) return { cols: 1, split: DEFAULT_SPLIT };
-    if (ids.length >= 3) return { cols: 3, split: DEFAULT_SPLIT };
-    return { cols: 2, split: splitOf(widths[ids[0]] || DEFAULT_CSPAN, widths[ids[1]] || DEFAULT_CSPAN) };
+    if (ids.length >= 4) return { cols: 4, split: DEFAULT_SPLIT };
+    if (ids.length === 3) return { cols: 3, split: DEFAULT_SPLIT };
+    return { cols: 2, split: splitOf(spanOf(widths[ids[0]]), spanOf(widths[ids[1]])) };
   }
   // Slice an ordered id list into rows of rowCfg[r].cols cards each.
   function computeRows(order, rowCfg) {
@@ -172,23 +199,22 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
 
   // Registry: id -> title. Order defines the default block order.
   const REGISTRY = [
-    { id: "todos",            title: "Todays to-do's"        },
-    { id: "matters-close",    title: "Matters ready to close" },
-    { id: "replies",          title: "Replies to send"        },
-    { id: "searches",         title: "Searches to follow-up"  },
-    { id: "client-relations", title: "Client relations"       },
-    { id: "aml-checks",       title: "AML Checks to complete" },
-    { id: "cashflow",         title: "Bills & Payments"       },
-    { id: "paf",              title: "PAF Deadline"           },
-    { id: "recent-matters",   title: "Recent Matters"         },
-    { id: "activities",       title: "Upcoming Activities"    },
-    { id: "recent-pafs",      title: "Recent PAFs"            },
-    { id: "time-recordings",  title: "Time Recordings"        },
+    { id: "replies",         title: "Draft replies to send"     },
+    { id: "documents",       title: "Find documents"            },
+    { id: "relations",       title: "Help with client relations" },
+    { id: "searches",        title: "Searches to follow-up"     },
+    { id: "matters",         title: "Matters to follow-up"      },
+    { id: "aml",             title: "AML Checks"                },
+    { id: "cashflow",        title: "Bills & payments"          },
+    { id: "paf",             title: "PAF Deadline"              },
+    { id: "activities",      title: "Upcoming activities"       },
+    { id: "recent-pafs",     title: "Recent PAFs"               },
+    { id: "time-recordings", title: "Time recordings"           },
   ];
   const REG_BY_ID = Object.fromEntries(REGISTRY.map((w) => [w.id, w]));
 
-  const content   = document.querySelector(".content");
-  const grid      = document.getElementById("widgetGrid");
+  const content   = document.querySelector(".main");
+  const grid      = document.getElementById("aiBlocks");
   if (!content || !grid) return;
 
   const editBtn   = document.querySelector(".page-header__edit");
@@ -229,7 +255,8 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
 
   /* ---------- state ---------- */
   function defaultState() {
-    return { items: REGISTRY.map((w) => ({ id: w.id, cspan: DEFAULT_CSPAN, rspan: 1, removed: false })) };
+    // AUTO width — untouched cards follow the responsive column count.
+    return { items: REGISTRY.map((w) => ({ id: w.id, cspan: AUTO, rspan: 1, removed: false })) };
   }
 
   function loadState() {
@@ -240,15 +267,18 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
       if (!parsed || !Array.isArray(parsed.items)) return defaultState();
       const items = parsed.items
         .filter((it) => REG_BY_ID[it.id])
-        .map((it) => ({
-          id: it.id,
-          cspan: snapCspan(parseInt(it.cspan, 10) || DEFAULT_CSPAN),
-          rspan: clamp(parseInt(it.rspan, 10) || 1, 1, ROWS_MAX),
-          removed: !!it.removed,
-        }));
+        .map((it) => {
+          const raw = parseInt(it.cspan, 10);
+          return {
+            id: it.id,
+            cspan: raw ? snapCspan(raw) : AUTO,
+            rspan: clamp(parseInt(it.rspan, 10) || 1, 1, ROWS_MAX),
+            removed: !!it.removed,
+          };
+        });
       const seen = new Set(items.map((it) => it.id));
       REGISTRY.forEach((w) => {
-        if (!seen.has(w.id)) items.push({ id: w.id, cspan: DEFAULT_CSPAN, rspan: 1, removed: false });
+        if (!seen.has(w.id)) items.push({ id: w.id, cspan: AUTO, rspan: 1, removed: false });
       });
       return { items };
     } catch (e) {
@@ -275,7 +305,9 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
       const el = nodes[it.id];
       if (!el) return;
       el.hidden = false;
-      el.style.setProperty("--cspan", it.cspan || 1);
+      // AUTO leaves --cspan unset so the CSS responsive default takes over.
+      if (it.cspan) el.style.setProperty("--cspan", it.cspan);
+      else el.style.removeProperty("--cspan");
       el.style.setProperty("--rspan", it.rspan || 1);
       grid.appendChild(el);   // re-append in order
     });
@@ -286,10 +318,13 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
   // (30/30/30, 50/50, 30/70, 70/30 or full). A ½ paired with a ⅓ (a "30/50")
   // becomes 30/70; a matched ½ + ½ stays 50/50.
   function normalizeLayout() {
-    const widths = Object.fromEntries(state.items.map((it) => [it.id, it.cspan || DEFAULT_CSPAN]));
+    const widths = Object.fromEntries(state.items.map((it) => [it.id, spanOf(it.cspan)]));
     const order = state.items.filter((it) => !it.removed).map((it) => it.id);
     const byId = Object.fromEntries(state.items.map((it) => [it.id, it]));
     packRows(order, widths).forEach((ids) => {
+      // A row where nothing has been resized stays AUTO, so it keeps following
+      // the responsive column count instead of being pinned to three-up.
+      if (ids.every((id) => byId[id] && !byId[id].cspan)) return;
       const cfg = rowCfgOf(ids, widths);
       const ws = widthsForRow(cfg.cols, cfg.split);
       ids.forEach((id, idx) => {
@@ -422,7 +457,7 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
 
   function openReorder() {
     if (!reorderPanel) return;
-    const widths = Object.fromEntries(state.items.map((it) => [it.id, it.cspan || DEFAULT_CSPAN]));
+    const widths = Object.fromEntries(state.items.map((it) => [it.id, spanOf(it.cspan)]));
     const order = state.items.filter((it) => !it.removed).map((it) => it.id);
     draft = {
       order: order,
@@ -599,14 +634,19 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
     if (!draft) return;
     // Convert the drawer's row model back into per-card widths.
     const rows = computeRows(draft.order, draft.rowCfg);
+    const byId = Object.fromEntries(state.items.map((it) => [it.id, it]));
     const widthMap = {};
     rows.forEach((row) => {
+      // A default-shaped row whose cards are all still AUTO stays AUTO, so
+      // re-ordering alone doesn't pin widths and lose the responsive columns.
+      const untouched = row.cols === DEFAULT_COLS && row.ids.every((id) => byId[id] && !byId[id].cspan);
       const ws = widthsForRow(row.cols, row.split);
-      row.ids.forEach((id, idx) => { widthMap[id] = ws[idx] != null ? ws[idx] : DEFAULT_CSPAN; });
+      row.ids.forEach((id, idx) => {
+        widthMap[id] = untouched ? AUTO : (ws[idx] != null ? ws[idx] : DEFAULT_CSPAN);
+      });
     });
-    const byId = Object.fromEntries(state.items.map((it) => [it.id, it]));
     const active = draft.order.map((id) => byId[id]).filter(Boolean);
-    active.forEach((it) => { it.cspan = widthMap[it.id] || DEFAULT_CSPAN; });
+    active.forEach((it) => { it.cspan = widthMap[it.id]; });
     const removed = state.items.filter((it) => it.removed);
     state.items = [...active, ...removed];
     flow();
@@ -1046,25 +1086,14 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
     quote: "“Really appreciate how proactive you've been on this — thank you, it's made a real difference.”",
   };
 
-  const relScrim    = document.getElementById("relScrim");
-  const relBody     = document.getElementById("relBody");
-  const relStatus   = document.getElementById("relStatus");
-  const relClose    = document.getElementById("relClose");
-  const relCloseBtn = document.getElementById("relCloseBtn");
   const replyScrim  = document.getElementById("replyScrim");
   const replyBody   = document.getElementById("replyBody");
   const replyClose  = document.getElementById("replyClose");
   const replyCancel = document.getElementById("replyCancel");
   const replySend   = document.getElementById("replySend");
-  if (!relScrim || !replyScrim) return;
+  if (!replyScrim) return;
 
-  let expandedId = null;
   let activeReplyId = null;
-  // When opened from a single relation card, the modal shows only that one.
-  let focusId = null;
-  function shownRelations() { return focusId ? RELATIONS.filter((r) => r.id === focusId) : RELATIONS; }
-
-  const esc = (s) => String(s);
 
   /* ---------- dashboard block ---------- */
   function relPreview(rel) {
@@ -1113,146 +1142,57 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
       if (foot) {
         foot.style.display = "";
         foot.innerHTML =
-          '<span class="mya-chip"><span class="material-symbols-outlined">cognition</span>Reviewed - please confirm</span>' +
+          '<span class="ai-chip"><span class="material-symbols-outlined">cognition</span>Reviewed - please confirm</span>' +
           '<button class="btn-tonal" type="button" data-action="open-relations">Review</button>';
       }
     }
   }
 
-  /* ---------- review modal (accordion) ---------- */
-  function statusText(s) { return s === "message" ? "Message Sent" : (s === "meeting" ? "Meeting Requested" : ""); }
-
-  // Every item renders its panel/body up-front (kept in the DOM) so expand /
-  // collapse can animate via CSS; only the `is-open` class changes at runtime.
-  function accItem(rel) {
-    const solo = !!focusId;
-    const open = solo || expandedId === rel.id;
-    const parts = rel.header.split(" · ");
-    const ref = parts.pop();
-    const titleHtml = '<span class="acc-head__stack"><span class="acc-head__title">' + parts.join(" - ") + '</span>' +
-      '<span class="acc-head__meta">Relating to ' + ref + '</span></span>';
-    // Single-item mode: static header (no toggle/chevron), body always shown.
-    const head = solo
-      ? '<div class="acc-head acc-head--static">' + titleHtml + '</div>'
-      : '<button class="acc-head" type="button" data-act="toggle" data-rel="' + rel.id + '">' +
-          titleHtml +
-          '<span class="acc-status"' + (rel.status ? "" : " hidden") + '>' + statusText(rel.status) + '</span>' +
-          '<span class="acc-head__chev"><span class="material-symbols-outlined">keyboard_arrow_down</span></span>' +
-        '</button>';
-    return (
-      '<div class="acc-item' + (open ? " is-open" : "") + (solo ? " acc-item--solo" : "") + '" data-rel="' + rel.id + '">' +
-        head +
-        '<div class="acc-panel"><div class="acc-body">' +
-          '<p class="acc-label">What the client said</p>' +
-          '<p class="acc-quote">' + rel.quote + '</p>' +
-          '<p class="acc-label">Overall Tone</p>' +
-          '<span class="tone-pill">' + rel.tone + '</span>' +
-          '<p class="acc-label">Why this was flagged</p>' +
-          '<ul class="flags">' + rel.flags.map((f) => '<li class="flag">' + f + '</li>').join("") + '</ul>' +
-          '<div class="acc-actions"' + (rel.status ? " hidden" : "") + '>' +
-            '<button class="btn-tonal" type="button" data-act="message" data-rel="' + rel.id + '">Send a message</button>' +
-          '</div>' +
-        '</div></div>' +
-      '</div>'
-    );
+  /* ---------- review modal ----------
+     Client relations reviews the drafted messages themselves — the same shape
+     as Review replies — rather than breaking down the relationship. */
+  function captureEdits(rel, bodyEl) {
+    if (!bodyEl) return;
+    const to = bodyEl.querySelector(".js-to");
+    const subject = bodyEl.querySelector(".js-subject");
+    const msg = bodyEl.querySelector(".js-message");
+    if (to) rel.reply.to = to.value;
+    if (subject) rel.reply.subject = subject.value;
+    if (msg) rel.reply.body = msg.value.split(/\n{2,}/);
   }
 
-  function renderAccordion() {
-    relBody.innerHTML = '<div class="acc">' + shownRelations().map(accItem).join("") + '</div>';
-    // Set initial panel heights without animating (fresh nodes don't transition).
-    relBody.querySelectorAll(".acc-item").forEach((it) => {
-      const panel = it.querySelector(".acc-panel");
-      if (panel) panel.style.height = it.classList.contains("is-open") ? "auto" : "0px";
-    });
-  }
-
-  // Lock the body's height to its tallest open state so collapsing every item
-  // doesn't shrink the modal — but never taller than the space left after the
-  // header + footer, so the footer always stays in view (the body scrolls for
-  // very tall content instead).
-  function lockHeight() {
-    relBody.style.minHeight = "";
-    let headers = 0, maxBody = 0;
-    relBody.querySelectorAll(".acc-item").forEach((it) => {
-      const head = it.querySelector(".acc-head");
-      const body = it.querySelector(".acc-body");
-      if (head) headers += head.offsetHeight;
-      if (body) maxBody = Math.max(maxBody, body.scrollHeight);
-    });
-    const modalEl = relBody.closest(".modal");
-    const chrome = modalEl ? (modalEl.offsetHeight - modalEl.querySelector(".modal__body").clientHeight) : 0;
-    const avail = window.innerHeight - 48 - chrome - 8;   // room left for the body; keeps it a scroll container
-    const want = headers + maxBody + 4;
-    if (want > 0) relBody.style.minHeight = Math.max(0, Math.min(want, avail)) + "px";
-  }
-
-  // Change which item is open — animates each panel's height explicitly so a
-  // collapsed panel is always exactly 0.
-  function setExpanded(id) {
-    expandedId = id;
-    relBody.querySelectorAll(".acc-item").forEach((it) => {
-      const panel = it.querySelector(".acc-panel");
-      const shouldOpen = it.dataset.rel === id;
-      const isOpen = it.classList.contains("is-open");
-      if (shouldOpen === isOpen) return;
-      it.classList.toggle("is-open", shouldOpen);
-      if (!panel) return;
-      if (shouldOpen) {
-        panel.style.height = panel.scrollHeight + "px";     // 0 → content
-        clearTimeout(panel._t);
-        panel._t = setTimeout(() => { panel.style.height = "auto"; }, 320);
-      } else {
-        if (panel.style.height === "auto" || panel.style.height === "") {
-          panel.style.height = panel.scrollHeight + "px";   // auto → px, then reflow
-          void panel.offsetHeight;
-        }
-        clearTimeout(panel._t);
-        panel.style.height = "0px";                          // → 0
-      }
-    });
-  }
-
-  function firstUnattended() {
-    const r = shownRelations().find((x) => !x.status);
-    return r ? r.id : null;
-  }
-  function setRelStatus(text) {
-    if (!relStatus) return;
-    if (text) { relStatus.textContent = text; relStatus.hidden = false; } else { relStatus.hidden = true; }
-  }
-  function setStatus(id, status) {
-    const rel = RELATIONS.find((r) => r.id === id);
-    if (rel) rel.status = status;
-    const item = relBody.querySelector('.acc-item[data-rel="' + id + '"]');
-    if (item) { const actions = item.querySelector(".acc-actions"); if (actions) actions.hidden = true; }
-    if (focusId) {
-      // Single-item mode: keep the content open (no collapse/cascade); the
-      // status goes in the modal header instead of on the item row.
-      setRelStatus(statusText(status));
-    } else {
-      // Update the item's own pill and cascade to the next un-attended item.
-      if (item) { const pill = item.querySelector(".acc-status"); if (pill) { pill.textContent = statusText(status); pill.hidden = false; } }
-      setExpanded(firstUnattended());
-    }
-  }
-
-  function openRelations(id) {
-    focusId = id || null;      // a single relation, or all
-    expandedId = id || null;   // focused relation opens expanded; otherwise all collapsed
-    renderAccordion();
-    const rel = focusId ? RELATIONS.find((r) => r.id === focusId) : null;
-    setRelStatus(rel && rel.status ? statusText(rel.status) : "");
-    relScrim.hidden = false;
-    requestAnimationFrame(lockHeight);
-  }
-  // Closing is the completion action now (the explicit "Mark as reviewed"
-  // button was removed): re-sync the block and to-do count on any close path.
-  function closeRelations() {
-    const attended = RELATIONS.filter((r) => r.status).length;
-    renderBlock();
-    updateTodos(attended);
-    relScrim.hidden = true;
-  }
+  const relationsModal = createReviewModal({
+    title: "Review client messages",
+    secondaryLabel: "Close",
+    completeOnClose: true,
+    trigger: "open-relations",
+    items: RELATIONS,
+    statusText: (st) => (st === "message" ? "Message Sent" : st === "draft" ? "Draft saved" : ""),
+    renderHeadMain: (rel) => {
+      const parts = rel.header.split(" \u00b7 ");
+      const ref = parts.pop();
+      return '<span class="acc-head__stack"><span class="acc-head__title">' + parts.join(" - ") + "</span>" +
+        '<span class="acc-head__meta">Relating to ' + ref + "</span></span>";
+    },
+    renderBody: (rel) =>
+      '<p class="acc-label">What the client said</p>' +
+      '<div class="reply-said"><p class="reply-said__meta">' + rel.reply.meta + "</p>" +
+        '<p class="reply-said__quote">' + rel.quote + "</p></div>" +
+      '<div class="reply-compose-head reply-compose-head--sp"><p class="reply-label">What you could say</p></div>' +
+      '<div class="email">' +
+        '<label class="email__row"><span class="email__label">To:</span><input class="email__input js-to" type="text" value="' + escA(rel.reply.to) + '"></label>' +
+        '<label class="email__row"><span class="email__label">Subject:</span><input class="email__input js-subject" type="text" value="' + escA(rel.reply.subject) + '"></label>' +
+        '<textarea class="email__textarea js-message" rows="7">' + escH(rel.reply.body.join("\n\n")) + "</textarea>" +
+      "</div>" +
+      '<div class="acc-actions">' +
+        '<button class="btn-tonal" type="button" data-act="send">Send reply</button>' +
+      "</div>",
+    onAction: (rel, act, api, btn) => {
+      captureEdits(rel, btn.closest(".acc-body"));
+      if (act === "send") animateSend(btn, true, () => api.setStatus(rel.id, "message"));
+    },
+    onComplete: () => updateTodos(RELATIONS.filter((r) => r.status).length),
+  });
 
   /* ---------- Todays to-do's ---------- */
   function updateTodos(attended) {
@@ -1264,7 +1204,7 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
   function escAttr(s) { return escHtml(s).replace(/"/g, "&quot;"); }
 
   function renderReply(rel) {
-    // To / Subject / message are editable — the user can amend Mya's draft.
+    // To / Subject / message are editable — the user can amend the Ai draft.
     replyBody.innerHTML =
       '<div class="reply">' +
         '<div class="reply-block">' +
@@ -1277,7 +1217,6 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
         '<div class="reply-block">' +
           '<div class="reply-compose-head">' +
             '<p class="reply-label">What you could say</p>' +
-            '<span class="mya-chip"><span class="material-symbols-outlined">cognition</span>Created by Mya</span>' +
           '</div>' +
           '<div class="email">' +
             '<label class="email__row"><span class="email__label">To:</span>' +
@@ -1326,30 +1265,16 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
       replySend.innerHTML = '<span class="material-symbols-outlined">check</span>';
       setTimeout(function () {
         closeReply();
-        setStatus(id, "message");   // back on the review modal, now "Message Sent"
+        const rel = RELATIONS.find((r) => r.id === id);
+        if (rel) rel.status = "message";
+        relationsModal.setStatus(id, "message");   // reflected if the review modal is open
+        updateTodos(RELATIONS.filter((r) => r.status).length);
         resetSendBtn();
       }, 650);
     }, 1000);
   }
 
   /* ---------- wiring ---------- */
-  document.addEventListener("click", function (e) {
-    const opener = e.target.closest('[data-action="open-relations"]');
-    if (opener) { e.preventDefault(); openRelations(); return; }
-    // Clicking an individual relation card opens the modal focused on just it.
-    const item = e.target.closest('[data-open-rel]');
-    if (item) { e.preventDefault(); openRelations(item.getAttribute("data-open-rel")); }
-  });
-
-  relBody.addEventListener("click", function (e) {
-    const btn = e.target.closest("[data-act]");
-    if (!btn) return;
-    const act = btn.getAttribute("data-act");
-    const id = btn.getAttribute("data-rel");
-    if (act === "toggle") { setExpanded(expandedId === id ? null : id); }
-    else if (act === "message") { openReply(id); }
-  });
-
   // thumbs rating (toggle highlight only)
   document.querySelectorAll(".rate__icons").forEach(function (grp) {
     grp.addEventListener("click", function (e) {
@@ -1360,21 +1285,18 @@ document.querySelectorAll("[data-tabs]").forEach((card) => {
     });
   });
 
-  relClose.addEventListener("click", closeRelations);
-  relCloseBtn.addEventListener("click", closeRelations);
-  relScrim.addEventListener("click", function (e) { if (e.target === relScrim) closeRelations(); });
-
   replyClose.addEventListener("click", closeReply);
   replyCancel.addEventListener("click", closeReply);
   replySend.addEventListener("click", sendReply);
   replyScrim.addEventListener("click", function (e) { if (e.target === replyScrim) closeReply(); });
 
   document.addEventListener("keydown", function (e) {
-    if (e.key !== "Escape") return;
-    if (!replyScrim.hidden) closeReply();
-    else if (!relScrim.hidden) closeRelations();
+    if (e.key === "Escape" && !replyScrim.hidden) closeReply();
   });
 
+  HALO.relations = RELATIONS;
+  HALO.openRelation = relationsModal.open;
+  HALO.openRelationReply = openReply;   // straight to the draft, skipping the analysis
   renderBlock();
 })();
 
@@ -1402,7 +1324,7 @@ const DASH_TODO = {
     if (wc) wc.textContent = done + " of " + total + " complete";
     const fill = todos.querySelector(".card__scroll .progress-track .progress-fill, .progress-track .progress-fill");
     if (fill) fill.style.width = (total ? Math.min(100, Math.round((done / total) * 100)) : 0) + "%";
-    this.updateMyaNote();
+    this.updateAiNote();
     // Empty-list "all caught up" note.
     const list = todos.querySelector(".todo-list");
     if (list && !list.querySelector(".todo-row") && !list.querySelector(".todo-done")) {
@@ -1420,7 +1342,7 @@ const DASH_TODO = {
     if (remaining <= 0) row.remove();
     else { const n = row.querySelector(".todo-n"); if (n) n.textContent = remaining; }
   },
-  // Mya's banner note mirrors the to-do list: it names each outstanding
+  // The banner note mirrors the to-do list: it names each outstanding
   // category and the total, and re-writes itself whenever a to-do is done.
   noteOrder: ["replies", "relations", "matters", "aml", "searches"],
   noteLabel: {
@@ -1430,8 +1352,8 @@ const DASH_TODO = {
     aml: (n) => (n === 1 ? "an AML check to complete" : n + " AML checks to complete"),
     searches: (n) => (n === 1 ? "a search to follow up" : n + " searches to follow up"),
   },
-  updateMyaNote() {
-    const body = document.querySelector(".mya-note__body");
+  updateAiNote() {
+    const body = document.querySelector(".ai-note__body");
     if (!body) return;
     const parts = [];
     let total = 0;
@@ -1470,7 +1392,6 @@ function createReviewModal(cfg) {
       '<div class="modal__head' + (cfg.subtitle ? " modal__head--stack" : "") + '">' +
         '<div class="modal__titles"><h2 class="modal__title">' + cfg.title + '</h2>' +
           (cfg.subtitle ? '<p class="modal__subtitle">' + cfg.subtitle + '</p>' : "") + '</div>' +
-        (cfg.headNote ? '<span class="mya-chip mya-chip--head"><span class="material-symbols-outlined">cognition</span>' + cfg.headNote + '</span>' : "") +
         '<span class="modal__status acc-status" hidden></span>' +
         '<button class="modal__close" type="button" aria-label="Close"><span class="material-symbols-outlined">close</span></button>' +
       '</div>' +
@@ -1480,7 +1401,7 @@ function createReviewModal(cfg) {
         '<div class="rate"><span class="rate__icons">' +
           '<button class="rate__btn" type="button" aria-label="Rate down"><span class="material-symbols-outlined">thumb_down</span></button>' +
           '<button class="rate__btn" type="button" aria-label="Rate up"><span class="material-symbols-outlined">thumb_up</span></button>' +
-        '</span><span class="rate__text">How accurate was Mya?<br>Rate our assessment, improve the Ai</span></div>' +
+        '</span><span class="rate__text">How accurate was this?<br>Rate our assessment, improve the Ai</span></div>' +
         '<div class="modal__actions">' +
           '<button class="btn-outline" type="button" data-mact="secondary">' + cfg.secondaryLabel + '</button>' +
           (cfg.primaryLabel ? '<button class="btn-filled" type="button" data-mact="primary">' + cfg.primaryLabel + '</button>' : "") +
@@ -1494,7 +1415,16 @@ function createReviewModal(cfg) {
   let expandedId = null;
   // When opened from a single item card, the modal shows only that item.
   let focusId = null;
-  function shownItems() { return focusId ? cfg.items.filter((i) => i.id === focusId) : cfg.items; }
+  // A prompt hands back a subset of the flow's records, so Review all is scoped
+  // to exactly those — reviewing "matters ready to close" must not list the
+  // 80%-complete ones the prompt filtered out.
+  let scopeIds = null;
+  function shownItems() {
+    let list = cfg.items;
+    if (scopeIds) list = list.filter((i) => scopeIds.indexOf(i.id) !== -1);
+    if (focusId) list = list.filter((i) => i.id === focusId);
+    return list;
+  }
 
   // Header "aside" = the pill on the right (a post-action status by default, or a
   // custom pill such as AML's progress % via cfg.renderAside).
@@ -1533,7 +1463,7 @@ function createReviewModal(cfg) {
   }
   function updatePrimary() {
     if (primaryBtn && cfg.primaryDoneLabel) {
-      primaryBtn.textContent = cfg.items.some((i) => i.status) ? cfg.primaryDoneLabel : cfg.primaryLabel;
+      primaryBtn.textContent = shownItems().some((i) => i.status) ? cfg.primaryDoneLabel : cfg.primaryLabel;
     }
   }
   function render() {
@@ -1602,8 +1532,9 @@ function createReviewModal(cfg) {
     }
     updatePrimary();
   }
-  function open(id) {
-    focusId = id || null;      // a single item, or all
+  function open(id, ids) {
+    scopeIds = ids && ids.length ? ids.slice() : null;
+    focusId = id || null;      // a single item, or the whole scope
     expandedId = id || null;   // focused item opens expanded; otherwise all collapsed
     render();
     const it = focusId ? cfg.items.find((i) => i.id === focusId) : null;
@@ -1640,11 +1571,16 @@ function createReviewModal(cfg) {
     const b = e.target.closest(".rate__btn"); if (!b) return;
     grp.querySelectorAll(".rate__btn").forEach((x) => x.classList.remove("is-active")); b.classList.add("is-active");
   }));
+  const scopeOf = (el) => {
+    const raw = el && el.getAttribute("data-scope");
+    return raw ? raw.split(",") : null;
+  };
   document.addEventListener("click", (e) => {
-    if (e.target.closest('[data-action="' + cfg.trigger + '"]')) { e.preventDefault(); open(); return; }
+    const all = e.target.closest('[data-action="' + cfg.trigger + '"]');
+    if (all) { e.preventDefault(); open(null, scopeOf(all)); return; }
     // Clicking an individual item card opens the modal focused on just that item.
     const item = e.target.closest('[data-open="' + cfg.trigger + '"]');
-    if (item) { e.preventDefault(); open(item.getAttribute("data-item-id")); }
+    if (item) { e.preventDefault(); open(item.getAttribute("data-item-id"), scopeOf(item)); }
   });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !scrim.hidden) close(); });
 
@@ -1680,7 +1616,7 @@ function animateSend(btn, tonal, cb) {
 }
 
 /* ---------- Replies to send: review modal ---------- */
-// Set by repliesReviewFlow; lets Mya's search-anomaly messages queue here too.
+// Set by repliesReviewFlow; lets the search-anomaly messages queue here too.
 let addSuggestedReplies = null;
 (function repliesReviewFlow() {
   const REPLIES = [
@@ -1841,7 +1777,7 @@ let addSuggestedReplies = null;
   ];
 
   // Priority order: client messages first, oldest (most days waiting) at the top;
-  // Mya's suggested messages are de-prioritised and sink to the bottom.
+  // Ai-suggested messages are de-prioritised and sink to the bottom.
   const rank = (r) => (r.suggested ? -1 : (parseInt(r.ago, 10) || 0));
   const sortReplies = () => REPLIES.sort((a, b) => rank(b) - rank(a));
   sortReplies();
@@ -1851,7 +1787,7 @@ let addSuggestedReplies = null;
       return (
         '<div class="msg-card msg-card--suggested"><p class="msg-card__quote">' + r.reply.subject + '</p>' +
         '<div class="msg-card__meta"><span>' + r.blockMeta + '</span>' +
-        '<span class="msg-card__tag"><span class="material-symbols-outlined">cognition</span>Suggested by Mya</span></div></div>'
+        '<span class="msg-card__tag"><span class="material-symbols-outlined">cognition</span>Suggested by Ai</span></div></div>'
       );
     }
     return (
@@ -1859,7 +1795,7 @@ let addSuggestedReplies = null;
       '<div class="msg-card__meta"><span>' + r.blockMeta + '</span><span>' + r.ago + '</span></div></div>'
     );
   }
-  // Queue Mya's search-anomaly suggestions into this block (once), de-prioritised.
+  // Queue the search-anomaly suggestions into this block (once), de-prioritised.
   addSuggestedReplies = function (msgs) {
     let added = 0;
     msgs.forEach((m) => {
@@ -1867,7 +1803,7 @@ let addSuggestedReplies = null;
       if (REPLIES.some((r) => r.id === id)) return;
       REPLIES.push({
         id: id, suggested: true, role: m.role, reason: m.reason,
-        blockMeta: "To: " + m.to, ago: "Suggested by Mya",
+        blockMeta: "To: " + m.to, ago: "Suggested by Ai",
         reply: { to: m.to, subject: m.subject, body: m.body.slice() }, status: null,
       });
       added++;
@@ -1895,7 +1831,7 @@ let addSuggestedReplies = null;
       else {
         foot.style.display = "";
         foot.innerHTML =
-          '<span class="mya-chip"><span class="material-symbols-outlined">cognition</span>Reviewed - please confirm</span>' +
+          '<span class="ai-chip"><span class="material-symbols-outlined">cognition</span>Reviewed - please confirm</span>' +
           '<button class="btn-tonal" type="button" data-action="open-replies">Review</button>';
       }
     }
@@ -1937,7 +1873,6 @@ let addSuggestedReplies = null;
 
   createReviewModal({
     title: "Review replies",
-    headNote: "Created by Mya",
     secondaryLabel: "Close",
     completeOnClose: true,
     trigger: "open-replies",
@@ -1955,7 +1890,7 @@ let addSuggestedReplies = null;
     },
     renderBody: (item) =>
       (item.suggested
-        ? '<p class="acc-label">Why Mya suggests this</p><div class="reply-said"><p class="reply-said__quote">' + item.reason + '</p></div>'
+        ? '<p class="acc-label">Why this is suggested</p><div class="reply-said"><p class="reply-said__quote">' + item.reason + '</p></div>'
         : '<p class="acc-label">What the client said</p><div class="reply-said"><p class="reply-said__meta">' + item.header + '</p><p class="reply-said__quote">' + item.quote + '</p></div>') +
       '<div class="reply-compose-head reply-compose-head--sp"><p class="reply-label">' + (item.suggested ? "Suggested message" : "What you could say") + '</p></div>' +
       '<div class="email">' +
@@ -1980,12 +1915,13 @@ let addSuggestedReplies = null;
     },
   });
 
+  HALO.replies = REPLIES;
   // Wire the existing Review button without disturbing the block's markup.
   renderBlock();
 })();
 
 /* ---------- Searches to renew: review modal ---------- */
-let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's help banner
+let searchMessagesApi = null;   // set by searchMessagesFlow; opened from the help banner
 (function searchesReviewFlow() {
   // Each search has a primary status chip and (optionally) a "Due" chip.
   //   kind: error (red) · warn (orange) · ok (green, ticked) · info (blue)
@@ -2006,6 +1942,22 @@ let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's 
         title: { property: "8 Bloomsbury Court, Donnington, Telford, TF2 8DL", la: "Telford", titleNo: "SY512338", proprietors: "Margaret A. Doyle" },
         applicant: { name: "Priya N. Sharma", reason: "Purchase" },
         plan: "8_Bloomsbury_Crt_plan.pdf" },
+      status: null,
+    },
+    {
+      id: "srch-hollybank", os: "OS1", ref: "D4417/1", matter: "Purchase of 12 Hollybank Rise, Solihull",
+      primary: { kind: "warn", label: "Expires 11 Aug 2026" }, state: "expiring",
+      details: { type: "OS1", from: "27 June 2026", sentBy: "Kristine Burton", fee: "£3.00 (electronic)",
+        title: { property: "12 Hollybank Rise, Shirley, Solihull, B90 2QD", la: "Solihull", titleNo: "WM701884", proprietors: "Nathan & Rosa Whitaker" },
+        applicant: { name: "Amara Diallo", reason: "Purchase" } },
+      status: null,
+    },
+    {
+      id: "srch-quarry", os: "OS2", ref: "V3092/4", matter: "Sale of Quarry Cottage, Matlock",
+      primary: { kind: "warn", label: "Expires 18 Aug 2026" }, state: "expiring",
+      details: { type: "OS2", from: "4 July 2026", sentBy: "Kristine Burton", fee: "£3.00 (electronic)",
+        title: { property: "Quarry Cottage, Riber Road, Matlock, DE4 5JU", la: "Derbyshire Dales", titleNo: "DY229517", proprietors: "Gordon L. Ashworth" },
+        applicant: { name: "Tomas Nowak", reason: "Sale" } },
       status: null,
     },
     {
@@ -2078,6 +2030,10 @@ let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's 
     d.estatePlan = !!d.estatePlan;
     if (typeof d.firstRegistrant !== "boolean") d.firstRegistrant = !!(d.applicant && d.applicant.name === d.title.proprietors);
   });
+  // Pending, expired and expiring searches all get the editable "what to
+  // submit" treatment; everything past that is read-only.
+  const isDraftable = (st) => st === "pending" || st === "expired" || st === "expiring";
+
   function feeLabel(d) { return d.feeAmount + " (" + (d.payment === "cheque" ? "cheque" : "electronic") + ")"; }
 
   // Submitting a search (from Pending Search or Expired) → Pending Certificate.
@@ -2089,7 +2045,7 @@ let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's 
     item.details.idNum = newSearchId();
     item.details.savedTo = item.ref + " - Documents";
   }
-  // Using one of Mya's actions on an anomalies certificate → Anomalies Reviewed.
+  // Using one of the Ai actions on an anomalies certificate → Anomalies Reviewed.
   function toReviewed(item) {
     if (item.state !== "anomalies-found") return false;
     item.state = "anomalies-reviewed";
@@ -2166,7 +2122,7 @@ let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's 
   }
   function sdFooter(item) {
     const st = item.state;
-    if (st === "pending" || st === "expired") {
+    if (isDraftable(st)) {
       // Paying by cheque means posting the application, so it's a single
       // download-to-submit action rather than download + electronic submit.
       if (item.details.payment === "cheque") {
@@ -2183,7 +2139,7 @@ let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's 
       '<button class="btn-outline" type="button" data-act="submit-search">Submit new search</button>';
   }
   function sdCard(item) {
-    const editable = item.state === "pending" || item.state === "expired";
+    const editable = isDraftable(item.state);
     const open = editable || item.state === "pending-cert";
     const idHtml = '<b>ID:</b> ' + (editable ? "Created once submitted" : item.details.idNum);
     const right = editable
@@ -2200,10 +2156,10 @@ let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's 
         // card (submitted states); the "What to submit" card's buttons sit below.
         (editable ? '' : '<div class="sd-foot">' + sdFooter(item) + '</div>') + '</div></div>';
   }
-  function myaHelp() {
+  function aiHelp() {
     return '<div class="sd-help">' +
       '<span class="sd-help__ico"><span class="material-symbols-outlined">cognition</span></span>' +
-      '<span class="sd-help__txt">Mya’s here to help<span class="sd-help__sub">Check-in with HMLR and key contacts</span></span>' +
+      '<span class="sd-help__txt">Here to help<span class="sd-help__sub">Check-in with HMLR and key contacts</span></span>' +
       '<span class="sd-help__actions">' +
         '<button class="sd-help__link" type="button" data-act="visit-hmlr">' +
           '<span class="material-symbols-outlined">arrow_outward</span>Visit HMLR</button>' +
@@ -2220,8 +2176,8 @@ let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's 
     } else {
       body += '<div class="sd-kv"><p class="sd-kv__l">Result</p><p class="sd-kv__v">' + c.result + '</p></div>';
     }
-    // Mya's recommendation is a full-width footer bar of the certificate card.
-    const helpBar = (c.anomalies && c.help) ? myaHelp() : "";
+    // The Ai recommendation is a full-width footer bar of the certificate card.
+    const helpBar = (c.anomalies && c.help) ? aiHelp() : "";
     return '<p class="sd-cert-label">Your certificate from HMLR</p>' +
       '<div class="sd-card sd-card--pdf' + (open ? " is-open" : "") + '">' +
         '<button class="sd-head" type="button" data-act="sd-toggle">' +
@@ -2264,7 +2220,7 @@ let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's 
     const d = item.details, os2 = item.os === "OS2";
     const typeOpts = ["OS1 - search of whole", "OS2 - search of part"];
     const typeVal = os2 ? "OS2 - search of part" : "OS1 - search of whole";
-    let h = '<p class="form-intro">These details have been automatically filled in by Mya based on the matter ' + item.ref + ', but can be freely edited based on your requirements.</p>';
+    let h = '<p class="form-intro">These details have been automatically filled in by Ai based on the matter ' + item.ref + ', but can be freely edited based on your requirements.</p>';
     h += '<p class="form-heading">Search details</p>' +
       '<div class="form-row">' + ffSelect("Type of search*", typeVal, typeOpts, "type") + ffText("Search from*", d.from, "from", { icon: "calendar_month" }) + '</div>' +
       ffSelect("Sent by*", d.sentBy, [d.sentBy, "Kristine Burton", "Other fee earner"], "sentBy");
@@ -2382,11 +2338,11 @@ let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's 
     renderBody: (item) => {
       const st = item.state;
       const label = st === "pending" ? "What to submit"
-        : st === "expired" ? 'What to submit <span class="sd-sub">(Based on your previous search)</span>'
+        : (st === "expired" || st === "expiring") ? 'What to submit <span class="sd-sub">(Based on your previous search)</span>'
         : "What was submitted";
       let h = '<p class="acc-label">' + label + '</p>' + sdCard(item);
-      // "What to submit" card (pending/expired) — buttons sit below the card.
-      if (st === "pending" || st === "expired") {
+      // "What to submit" card — buttons sit below the card.
+      if (isDraftable(st)) {
         h += '<div class="sd-actions">' + sdFooter(item) + '</div>';
       }
       // Certificate from HMLR — its own card, with the buttons below it.
@@ -2412,17 +2368,18 @@ let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's 
         window.open("https://search-property-information.service.gov.uk/", "_blank", "noopener");
       } else if (act === "message-contacts") {
         // Reviewing the messages (closing that modal) is what marks it reviewed.
-        if (searchMessagesApi) searchMessagesApi.open(() => { if (toReviewed(item)) { api.rerender(); renderBlock(); } });
+        if (searchMessagesApi) searchMessagesApi.open(item, () => { if (toReviewed(item)) { api.rerender(); renderBlock(); } });
       }
     },
     onComplete: () => { renderBlock(); },
   });
 
+  HALO.searches = SEARCHES;
   renderBlock();
 })();
 
 /* ---------- Search anomalies: "Review messages to send" modal ----------
-   Opened from the "Message Contacts" button in Mya's help banner. Drafts one
+   Opened from the "Message Contacts" button in the help banner. Drafts one
    message per party the result flags — matter client, the other side's
    solicitor, the client's lender and HM Land Registry — each keyed to the
    specific adverse entry in the certificate's Result text. */
@@ -2475,9 +2432,14 @@ let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's 
   ];
 
   let onReviewedCb = null, sentThisSession = false;
+  HALO.searchMessages = MESSAGES;
+
+  // Which search these messages were drafted for — shown on each row and
+  // re-pointed when the modal is opened from a specific certificate.
+  let source = { os: "OS2", ref: "R068/1" };
+
   const messagesModal = createReviewModal({
     title: "Review messages to send",
-    headNote: "Created by Mya",
     secondaryLabel: "Close",
     completeOnClose: true,
     // Only mark the search reviewed if a message was actually sent this session.
@@ -2485,9 +2447,12 @@ let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's 
     trigger: "open-search-messages",
     items: MESSAGES,
     statusText: (s) => (s === "message" ? "Message Sent" : s === "draft" ? "Draft saved" : ""),
-    renderHeadMain: (m) => '<span class="acc-head__stack"><span class="acc-head__title">' + m.to + '</span><span class="acc-head__meta">' + m.role + '</span></span>',
+    renderHeadMain: (m) =>
+      '<span class="acc-head__stack"><span class="acc-head__title">' + m.to + "</span>" +
+        '<span class="acc-head__meta">' + m.role + ' · in relation to <span class="search-os">' + source.os + "</span> for " + source.ref + "</span>" +
+      "</span>",
     renderBody: (m) =>
-      '<p class="acc-label">Why Mya suggests this</p>' +
+      '<p class="acc-label">Why this is suggested</p>' +
       '<div class="reply-said"><p class="reply-said__quote">' + m.reason + '</p></div>' +
       '<div class="reply-compose-head reply-compose-head--sp"><p class="reply-label">Suggested message</p></div>' +
       '<div class="email">' +
@@ -2508,7 +2473,9 @@ let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's 
   // Opening the suggestions also queues them into the Replies to send block.
   // onReviewed fires on close, but only if a message was sent this session.
   searchMessagesApi = {
-    open: (onReviewed) => {
+    open: (search, onReviewed) => {
+      if (typeof search === "function") { onReviewed = search; search = null; }
+      if (search && search.os && search.ref) source = { os: search.os, ref: search.ref };
       onReviewedCb = onReviewed || null;
       sentThisSession = false;
       if (addSuggestedReplies) addSuggestedReplies(MESSAGES);
@@ -2518,7 +2485,7 @@ let searchMessagesApi = null;   // set by searchMessagesFlow; opened from Mya's 
 })();
 
 /* ---------- shared checklist helpers ---------- */
-function myaChecklist(checks) {
+function aiChecklist(checks) {
   // Each row is an expandable accordion (chevron). The status chip conveys the
   // state; the panel holds supporting detail (placeholder content for now).
   return '<ul class="checklist">' + checks.map((c) =>
@@ -2534,7 +2501,7 @@ function myaChecklist(checks) {
     '</li>'
   ).join("") + '</ul>';
 }
-function myaProgress(pct) {
+function aiProgress(pct) {
   return '<div class="check-prog"><span class="check-prog__label">Progress</span>' +
     '<div class="progress-track"><div class="progress-fill progress-fill--' + (pct >= 100 ? "ok" : "warn") + '" style="width:' + pct + '%"></div></div>' +
     '<span class="check-prog__pct">' + pct + '% Complete</span></div>';
@@ -2688,7 +2655,7 @@ function myaProgress(pct) {
       else {
         foot.style.display = "";
         foot.innerHTML =
-          '<span class="mya-chip"><span class="material-symbols-outlined">cognition</span>Reviewed - please confirm</span>' +
+          '<span class="ai-chip"><span class="material-symbols-outlined">cognition</span>Reviewed - please confirm</span>' +
           '<button class="btn-tonal" type="button" data-action="open-matters">Review</button>';
       }
     }
@@ -2712,8 +2679,8 @@ function myaProgress(pct) {
     renderHeadMain: (m) => '<span class="acc-head__stack"><span class="acc-head__title">' + m.title + '</span><span class="acc-head__meta">' + m.sub + '</span></span>',
     renderBody: (m) =>
       '<p class="acc-label">What’s left to complete</p>' +
-      myaChecklist(m.checks) +
-      myaProgress(m.pct) +
+      aiChecklist(m.checks) +
+      aiProgress(m.pct) +
       '<p class="check-note">Request to close matter will become available when status reaches 100%. Closing is final.</p>' +
       '<div class="acc-actions"><button class="btn-filled" type="button" data-act="close-matter"' + (m.pct >= 100 ? "" : " disabled") + '>Close Matter</button></div>',
     onAction: (m, act, api, btn) => {
@@ -2727,6 +2694,7 @@ function myaProgress(pct) {
     },
   });
 
+  HALO.matters = MATTERS;
   renderBlock();
 })();
 
@@ -2842,7 +2810,7 @@ function myaProgress(pct) {
       else {
         foot.style.display = "";
         foot.innerHTML =
-          '<span class="mya-chip"><span class="material-symbols-outlined">cognition</span>Reviewed - please confirm</span>' +
+          '<span class="ai-chip"><span class="material-symbols-outlined">cognition</span>Reviewed - please confirm</span>' +
           '<button class="btn-tonal" type="button" data-action="open-aml">Review</button>';
       }
     }
@@ -2861,8 +2829,8 @@ function myaProgress(pct) {
     renderHeadMain: (a) => '<span class="acc-head__stack"><span class="acc-head__title">' + a.title + '</span><span class="acc-head__meta">' + a.sub + '</span></span>',
     renderBody: (a) =>
       '<p class="acc-label">What’s left to check</p>' +
-      myaChecklist(a.checks) +
-      myaProgress(a.pct),
+      aiChecklist(a.checks) +
+      aiProgress(a.pct),
     onComplete: () => {
       AML.forEach((a) => { a.status = "reviewed"; });
       renderBlock();
@@ -2872,10 +2840,11 @@ function myaProgress(pct) {
     },
   });
 
+  HALO.aml = AML;
   renderBlock();
 })();
 
-/* ---------- "How accurate was Mya?" thumbs feedback ----------
+/* ---------- "How accurate was this?" thumbs feedback ----------
    Clicking a thumb (in any modal footer) fills it and swaps the caption to a
    thank-you. Delegated so it covers every modal, including the ones built by
    the review-modal factory. */
@@ -2937,27 +2906,49 @@ document.addEventListener("click", function (e) {
    and the Customise button.
    ============================================================ */
 (function onboarding() {
-  const KEY = "halo_onboarded_v1";
+  const KEY = "halo_onboarded_v2";
   const force = location.hash === "#onboard";
   if (!force && localStorage.getItem(KEY)) return;
+  if (!document.getElementById("aiBlocks")) return;
 
-  const FEATURES = [
-    { icon: "assignment",           title: "Today's to-dos",          desc: "One prioritised list of everything worth your time today." },
-    { icon: "task_alt",             title: "Matters ready to close",  desc: "See what's complete and ready to wrap up, at a glance." },
-    { icon: "mark_unread_chat_alt", title: "Replies to send",         desc: "Client questions waiting on you, oldest first." },
-    { icon: "cached",               title: "Searches to renew",       desc: "Never let an expiring search slip past you again." },
-    { icon: "person_check",         title: "Client relations",        desc: "Spot the relationships that need a little nurturing." },
-    { icon: "health_and_safety",    title: "AML checks to complete",  desc: "Outstanding compliance flagged before it turns urgent." },
+  // The intro now introduces the three assistants rather than the blocks.
+  const ASSISTANTS = [
+    { id: "finance",        name: "Finance",        desc: "Watches the money side — balances to clear, bills and payments, and the AML checks that unblock a matter." },
+    { id: "operations",     name: "Operations",     desc: "Helps keeps matters moving — find expiring searches, assistance with submissions, and identify everything sitting at 100% waiting to close." },
+    { id: "communications", name: "Communications", desc: "Handles the talking — draft replies to unanswered clients and get help nuturing particularly sour relationships." },
   ];
 
+  // Steps 1 and 2 are the same block either side of running a prompt, so the
+  // walkthrough puts it into each state as you arrive. `demo` is the hook
+  // dashboard.js exposes; it skips the assistant's 6s think.
+  const demo = () => (window.HALO && window.HALO.demo) || null;
+  const DEMO_BLOCK = "replies";
+
   const STEPS = [
-    { sel: '[data-widget-id="todos"]',            title: "Your morning to-do list",  body: "Everything that needs your attention today, prioritised with the most urgent items at the top. Start here each morning." },
-    { sel: '[data-widget-id="matters-close"]',    title: "Matters ready to close",   body: "Matters at or near 100% completion. Review the summary and confirm to close them off in just a couple of clicks." },
-    { sel: '[data-widget-id="replies"]',          title: "Replies to send",          body: "Client questions still waiting on an answer. The longest-waiting appear first, so nothing slips through the cracks." },
-    { sel: '[data-widget-id="searches"]',         title: "Searches to renew",        body: "Property searches nearing or past their expiry date. Renew them before they lapse to keep the matter moving." },
-    { sel: '[data-widget-id="client-relations"]', title: "Client relations",         body: "Conversations where the tone is trending negative. A quick check-in here helps protect the relationship." },
-    { sel: '[data-widget-id="aml-checks"]',       title: "AML checks to complete",   body: "Outstanding anti-money-laundering checks. Clear these to stay compliant and unblock the matter." },
-    { sel: '.page-header__edit',                  title: "A space to customise",     body: "Want to prioritise one block over another? Expand, contract and rearrange the page to suit your needs.", below: true },
+    {
+      sel: '#assistantFilters',
+      title: "Three assistants, one dashboard",
+      body: "Finance, Operations and Communications each own a slice of your matters. Pick one to narrow the grid to just the blocks it looks after.",
+      enter: () => { const d = demo(); if (d) d.prompt(DEMO_BLOCK); },
+    },
+    {
+      sel: '[data-widget-id="replies"]',
+      title: "Start with a prompt",
+      body: "Every block offers a couple of ready-made prompts. Choose one and the assistant runs it — or drop a file on the upload area for something tailored.",
+      enter: () => { const d = demo(); if (d) d.prompt(DEMO_BLOCK); },
+    },
+    {
+      sel: '[data-widget-id="replies"]',
+      title: "Work through the stack",
+      body: "Results come back as a stack of cards, the next one waiting behind. Skip it, act on it, or open Review all to see the full list in one place.",
+      enter: () => { const d = demo(); if (d) d.results(DEMO_BLOCK, 0); },
+    },
+    {
+      sel: '.page-header__edit',
+      title: "A space to customise",
+      body: "Want to prioritise one block over another? Expand, contract and rearrange the grid to suit your needs.",
+      below: true,
+    },
   ];
 
   function markDone() { localStorage.setItem(KEY, "1"); }
@@ -2970,12 +2961,16 @@ document.addEventListener("click", function (e) {
     '<div class="onb-modal" role="dialog" aria-modal="true" aria-labelledby="onbTitle">' +
       '<button class="onb-x" type="button" aria-label="Close"><span class="material-symbols-outlined">close</span></button>' +
       '<span class="onb-chip"><span class="material-symbols-outlined">star</span>New to Halo</span>' +
-      '<h2 class="onb-title" id="onbTitle">Meet your Intelligent Dashboard</h2>' +
-      '<p class="onb-sub">We’ve brought everything that needs your attention into one place — six new blocks that keep matters moving, all designed to help life be a little easier.</p>' +
-      '<div class="onb-grid">' +
-        FEATURES.map((f) =>
-          '<div class="onb-feat"><span class="onb-feat__ico"><span class="material-symbols-outlined">' + f.icon + '</span></span>' +
-          '<div class="onb-feat__txt"><p class="onb-feat__t">' + f.title + '</p><p class="onb-feat__d">' + f.desc + '</p></div></div>'
+      // The three assistants, linked, at a size that lets the animation read.
+      '<div class="onb-orbs" aria-hidden="true">' +
+        ASSISTANTS.map((a) => '<ai-orb class="onb-orb" variant="' + a.id + '"></ai-orb>').join("") +
+      '</div>' +
+      '<h2 class="onb-title" id="onbTitle">Meet your new dashboard</h2>' +
+      '<p class="onb-sub">Three Ai assistants now work across your matters, each looking after a different corner of them. When prompted, they can read what has come in, run an analysis and hand you something you can act on — you decide what happens next.</p>' +
+      '<div class="onb-grid onb-grid--assistants">' +
+        ASSISTANTS.map((a) =>
+          '<div class="onb-feat"><ai-orb class="onb-feat__orb" variant="' + a.id + '"></ai-orb>' +
+          '<div class="onb-feat__txt"><p class="onb-feat__t">' + a.name + '</p><p class="onb-feat__d">' + a.desc + '</p></div></div>'
         ).join("") +
       '</div>' +
       '<div class="onb-foot">' +
@@ -3027,8 +3022,11 @@ document.addEventListener("click", function (e) {
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(v, hi));
   const block = (e) => e.preventDefault();
 
-  function place(rect, below) {
-    const PAD = 6, GAP = 16, M = 12;
+  function place(rect, below, flush) {
+    // Grid cells are flush with a 1px rule between them, so a padded halo would
+    // spill onto their neighbours — sit exactly on the cell instead.
+    const PAD = flush ? 0 : 6, GAP = 16, M = 12;
+    hole.classList.toggle("tour-hole--flush", !!flush);
     hole.style.top = (rect.top - PAD) + "px";
     hole.style.left = (rect.left - PAD) + "px";
     hole.style.width = (rect.width + PAD * 2) + "px";
@@ -3064,6 +3062,8 @@ document.addEventListener("click", function (e) {
     const step = STEPS[i];
     const target = document.querySelector(step.sel);
     if (!target) { endTour(); return; }
+    // Before measuring — a step may change what its target is showing.
+    if (step.enter) step.enter();
 
     elStep.textContent = "Step " + (i + 1) + " of " + STEPS.length;
     elTitle.textContent = step.title;
@@ -3085,7 +3085,7 @@ document.addEventListener("click", function (e) {
 
     if (!animate) { hole.style.transition = "none"; pop.style.transition = "none"; }
     if (delta) window.scrollTo({ top: desired, behavior: animate ? "smooth" : "auto" });
-    place(finalRect, step.below);
+    place(finalRect, step.below, target.classList.contains("cell"));
     if (!animate) {
       // Re-enable transitions once the initial (jump-free) placement is painted.
       requestAnimationFrame(() => { requestAnimationFrame(() => { hole.style.transition = ""; pop.style.transition = ""; }); });
@@ -3101,6 +3101,8 @@ document.addEventListener("click", function (e) {
     requestAnimationFrame(() => render(0, false));
   }
   function endTour() {
+    const d = demo();
+    if (d) d.prompt(DEMO_BLOCK);   // hand the block back in its landing state
     tour.hidden = true;
     document.removeEventListener("wheel", block, { passive: false });
     document.removeEventListener("touchmove", block, { passive: false });
