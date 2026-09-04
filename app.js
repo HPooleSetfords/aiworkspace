@@ -102,7 +102,6 @@
     searchResults: document.getElementById('search-results'),
     searchTab: document.getElementById('search-tab'),
     searchbarLabel: document.getElementById('searchbar-label'),
-    toasts: document.getElementById('toasts'),
   };
 
   // ------------------------------------------------------------
@@ -118,14 +117,6 @@
     if (h < 12) return 'Good Morning';
     if (h < 18) return 'Good Afternoon';
     return 'Good Evening';
-  }
-
-  function toast(html, ms) {
-    var node = document.createElement('div');
-    node.className = 'toast';
-    node.innerHTML = html;
-    el.toasts.appendChild(node);
-    setTimeout(function () { node.remove(); }, ms || 2600);
   }
 
   function allTasks() {
@@ -202,10 +193,7 @@
   }
 
   function newTab() {
-    if (state.tabs.length >= MAX_TABS) {
-      toast('That&rsquo;s ' + MAX_TABS + ' tabs — close one first');
-      return;
-    }
+    if (state.tabs.length >= MAX_TABS) return;
     selectTab(addTab([]).id);
   }
 
@@ -299,13 +287,9 @@
       if (def && def.children) {
         state.navOpen[def.id] = !state.navOpen[def.id];
         renderRail();
-      } else if (def && !def.selected) {
-        toast('<b>' + esc(def.label) + '</b> is outside this prototype');
       }
-      return;
+      // every other destination is outside this prototype, so it sits inert
     }
-    var child = e.target.closest('[data-nav-child]');
-    if (child) toast('<b>' + esc(child.dataset.navChild) + '</b> is outside this prototype');
   });
 
   // ------------------------------------------------------------
@@ -392,7 +376,6 @@
     state.prompt.matters = [ref];
     syncMatterTab();
     goto('start');
-    toast('Opened <b>' + esc(ref) + '</b> — ' + esc(m.client));
   }
 
   // ------------------------------------------------------------
@@ -500,14 +483,7 @@
       renderMatterStrip();
       return;
     }
-    if (e.target.closest('[data-matter-action]')) {
-      toast('Matter <b>Actions</b> is outside this prototype');
-      return;
-    }
-    var tab = e.target.closest('[data-mtab]');
-    if (tab && tab.dataset.mtab !== 'Workspace') {
-      toast('<b>' + esc(tab.dataset.mtab) + '</b> is outside this prototype');
-    }
+    // Actions and the other section tabs are outside this prototype
   });
 
   // ------------------------------------------------------------
@@ -858,10 +834,9 @@
     var task = findTask(card.dataset.task);
     if (!task) return;
 
-    if (btn.dataset.act === 'secondary') {
-      toast('<b>' + esc(task.secondary) + '</b> — ' + esc(task.meta));
-      return;
-    }
+    // Review / Preview / Edit would open the record itself, which is
+    // outside this prototype
+    if (btn.dataset.act === 'secondary') return;
     resolveTask(task, btn.dataset.act === 'skip' ? 'skipped' : 'done', card);
   });
 
@@ -873,20 +848,12 @@
     state.resolved[task.id] = outcome;
     if (outcome === 'done') state.cleared += task.mins;
 
-    toast(outcome === 'done'
-      ? '<b>' + esc(task.primary) + '</b> — ' + W.formatMins(task.mins) + ' cleared'
-      : 'Skipped — ' + esc(task.meta));
-
     // let the card animate out, then redraw so the deck restacks, the section
     // time drops and anything waiting on this lane unlocks
     cardEl.classList.add('is-leaving');
     setTimeout(function () {
       renderColumns();
       renderToolbar();
-      if (isAllClear()) {
-        toast('That&rsquo;s <b>' + W.formatMins(state.cleared) +
-          '</b> of work signed off. Caseload clear for this session.', 4200);
-      }
     }, 320);
   }
 
@@ -976,9 +943,6 @@
     if (loop) {
       state.loop = !state.loop;
       loop.setAttribute('aria-checked', String(state.loop));
-      toast(state.loop
-        ? 'Halo will re-organise this list each morning'
-        : 'Daily loop off — organise manually');
     }
   });
 
@@ -1356,14 +1320,11 @@
     if (e.target.closest('#ask-pass')) {
       state.askOpen = false;
       renderAsk();
-      toast('Passed — Halo will keep the drafts for later');
       return;
     }
     if (e.target.closest('#ask-add')) { addAskTask(); return; }
-    // the preview card inside the chat is a sample, not a live task
-    if (e.target.closest('[data-act]')) {
-      toast('This is the draft Halo prepared — add it to your Comms tasks to action it');
-    }
+    // the preview card inside the chat is a sample, not a live task, so its
+    // own buttons do nothing
   });
 
   // Ticket 33593 — work handed over from the chat lands in the columns.
@@ -1383,12 +1344,8 @@
       else comms.sections.unshift({ name: task.section, tasks: [task], mins: task.mins });
       renderColumns();
       renderToolbar();
-      renderAsk();
-      toast('Added <b>26 drafts</b> to your Communications column');
-    } else {
-      renderAsk();
-      toast('Communications is not in scope — add it to your task types first');
     }
+    renderAsk();
   }
 
   // ------------------------------------------------------------
@@ -1549,15 +1506,21 @@
     transitionSeq++;
     state.transition = null;
 
-    // Every route restores the whole prompt the frame was drawn with — one
-    // hour, across the route's task types, over the whole caseload — so a
-    // duration or matter scope set earlier cannot leak into a review screen.
+    // Every route restores the whole screen the frame was drawn with — one
+    // hour, across the route's task types, over the whole caseload, with
+    // nothing cleared and nothing added — so a prompt, a cleared card or an
+    // Ask Halo hand-off from earlier cannot leak into a review screen.
     state.prompt.amount = 1;
     state.prompt.unit = 'Hours';
     state.prompt.taskTypes = route.taskTypes.slice();
     state.prompt.matters = [];
     state.tabs = [];
     state.activeTab = addTab([]).id;
+    state.resolved = {};
+    state.cleared = 0;
+    state.extras = [];
+    state.entering = false;
+    state.askOpen = false;
 
     if (route.screen === 'loaded') {
       state.workload = W.build(state.prompt, allTasks());

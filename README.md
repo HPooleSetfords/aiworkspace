@@ -35,10 +35,10 @@ They are also all reachable by using the prototype normally.
 `#thinking` and `#comms-thinking` hold still for review. Reached by
 pressing **Organise**, it plays out as a sequence (below) and then advances.
 
-Every route restores the whole prompt the frame was drawn with — one
-hour, the route's task types, the whole caseload, no open tabs — so a
-duration or matter scope you set earlier cannot leak into a review
-screen.
+Every route restores the whole screen the frame was drawn with — one hour,
+the route's task types, the whole caseload, no open tabs, nothing cleared
+and nothing handed over from Ask Halo — so a prompt, a cleared card or an
+earlier session cannot leak into a review screen.
 
 Reference exports of every frame are in `reference/`.
 
@@ -197,7 +197,12 @@ that matter — so **Organise** then plans only that file's work.
 and credits the time, and the toolbar keeps a running "x mins cleared,
 y mins left". Clearing the top card of a stack reveals the one behind it
 and drops the section's time. The secondary action (Review / Preview /
-Edit) is a stub — it reports what it would open.
+Edit) would open the record itself, so it does nothing here.
+
+There are no toast notifications. Anything outside the prototype — the
+other sidenav destinations, the matter header's Actions and section tabs,
+the card's secondary action, the sample card inside the Ask Halo chat —
+simply sits inert rather than announcing itself.
 
 **Blocked work** — the Trustpilot card stays locked, exactly as drawn,
 until every finance and operations task is dealt with. Clear them and it
