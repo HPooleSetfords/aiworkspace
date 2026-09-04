@@ -1,602 +1,112 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en-GB">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Halo — Intelligent Dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..600,0..1,0" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="dashboard.css" />
-  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Halo — Ai Matter Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 </head>
-<body class="halo">
+<body>
 
-  <!-- ============================ TOP APP BAR ============================ -->
-  <header class="topbar">
-    <a class="topbar__logo" href="#" aria-label="Halo">
-      <img src="assets/halo-logo.svg" alt="Halo" />
-    </a>
-    <nav class="topbar__actions" aria-label="User">
-      <button class="iconbtn" type="button" aria-label="Search"><span class="material-symbols-outlined">search</span></button>
-      <button class="iconbtn" type="button" aria-label="Help"><span class="material-symbols-outlined">help</span></button>
-      <button class="iconbtn" type="button" aria-label="Notifications"><span class="material-symbols-outlined">notifications</span></button>
-      <button class="iconbtn" type="button" aria-label="Account"><span class="material-symbols-outlined">account_circle</span></button>
-    </nav>
-  </header>
+<div class="app" id="app">
 
-  <div class="layout">
+  <!-- ===== Ticket 33592 — Sidenav ===================================== -->
+  <nav class="rail" aria-label="Main">
+    <div class="rail__brand">
+      <img src="assets/halo-logo.svg" alt="Halo" width="96" height="32">
+    </div>
+    <div class="rail__nav" id="rail-nav">
+      <button class="icon-btn" id="rail-toggle" aria-label="Collapse navigation" aria-expanded="true">
+        <span><img src="assets/icon-menu.svg" alt=""></span>
+      </button>
+      <!-- nav items are rendered by app.js so the collapse + groups stay in one place -->
+    </div>
+  </nav>
 
-    <!-- ======================= NAVIGATION RAIL ======================= -->
-    <aside class="rail" aria-label="Primary">
-      <div class="rail__top">
-        <button class="iconbtn iconbtn--rail" type="button" aria-label="Collapse menu">
-          <span class="material-symbols-outlined">menu</span>
+  <div class="main">
+
+    <!-- ===== Ticket 33591 — Top nav ================================== -->
+    <header class="topbar">
+      <button class="searchbar" id="open-search" aria-label="Search Halo" aria-haspopup="dialog">
+        <span class="searchbar__label" id="searchbar-label">Search Halo</span>
+        <span class="searchbar__trailing">
+          <span class="icon-btn"><span><img src="assets/icon-search.svg" alt=""></span></span>
+        </span>
+      </button>
+
+      <div class="topbar__actions">
+        <button class="icon-btn" aria-label="Help">
+          <span><img src="assets/icon-help.svg" alt=""></span>
         </button>
-        <nav class="rail__menu">
-          <a class="navitem navitem--active" href="#">
-            <span class="navitem__main"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></span>
-          </a>
-          <a class="navitem" href="#">
-            <span class="navitem__main"><span class="material-symbols-outlined">cases</span><span>Client Matters</span></span>
-          </a>
-          <a class="navitem" href="#">
-            <span class="navitem__main"><span class="material-symbols-outlined">article_person</span><span>Clients</span></span>
-          </a>
-          <a class="navitem" href="#">
-            <span class="navitem__main"><span class="material-symbols-outlined">point_of_sale</span><span>Accounting</span></span>
-          </a>
-          <a class="navitem" href="#">
-            <span class="navitem__main"><span class="material-symbols-outlined">corporate_fare</span><span>Head office</span></span>
-            <span class="material-symbols-outlined navitem__chev">keyboard_arrow_down</span>
-          </a>
-          <a class="navitem" href="#">
-            <span class="navitem__main"><span class="material-symbols-outlined">tab</span><span>Reports</span></span>
-            <span class="material-symbols-outlined navitem__chev">keyboard_arrow_down</span>
-          </a>
-          <a class="navitem" href="#">
-            <span class="navitem__main"><span class="material-symbols-outlined">admin_panel_settings</span><span>Settings</span></span>
-            <span class="material-symbols-outlined navitem__chev">keyboard_arrow_down</span>
-          </a>
-        </nav>
+        <button class="icon-btn" aria-label="Notifications">
+          <span><img src="assets/icon-bell.svg" alt=""></span>
+        </button>
+        <button class="text-btn">Log out</button>
       </div>
+    </header>
 
-      <div class="wallet">
-        <p class="wallet__title">Ai token usage</p>
-        <div class="wallet__meter">
-          <div class="wallet__row">
-            <div class="wallet__nums">
-              <p class="wallet__used">3,200 used</p>
-              <p class="wallet__left">16,800 left</p>
-            </div>
-            <img class="wallet__ring" src="assets/token-ring.svg" alt="" />
-          </div>
-          <p class="wallet__reset">Resets 1 August 2026</p>
-        </div>
-      </div>
-    </aside>
+    <div class="tabs" id="tabs" role="tablist" aria-label="Open matters"></div>
+    <div id="matter-strip"></div>
 
-    <!-- =========================== CONTENT =========================== -->
-    <main class="main">
-
-      <div class="pagehead">
-        <div class="pagehead__left">
-          <div class="pagehead__titles">
-            <h1 class="pagehead__title">Intelligent Dashboard</h1>
-            <p class="pagehead__sub">Matter management powered by Ai</p>
-            <p class="pagehead__desc">Interact with Halo’s Ai assistants to run analysis, then choose how to use it’s response.</p>
-          </div>
-
-          <div class="filters">
-            <p class="filters__label">Filter by assistant</p>
-            <div class="filters__row" id="assistantFilters">
-              <button class="assistant assistant--finance" type="button" data-assistant="finance" aria-pressed="false">
-                <ai-orb class="assistant__ring" variant="finance"></ai-orb>
-                <span class="assistant__text">
-                  <span class="assistant__name">Finance</span>
-                  <span class="assistant__desc">Help with finance tasks</span>
-                </span>
-              </button>
-              <button class="assistant assistant--operations" type="button" data-assistant="operations" aria-pressed="false">
-                <ai-orb class="assistant__ring" variant="operations"></ai-orb>
-                <span class="assistant__text">
-                  <span class="assistant__name">Operations</span>
-                  <span class="assistant__desc">Help with operational tasks</span>
-                </span>
-              </button>
-              <button class="assistant assistant--communications" type="button" data-assistant="communications" aria-pressed="false">
-                <ai-orb class="assistant__ring" variant="communications"></ai-orb>
-                <span class="assistant__text">
-                  <span class="assistant__name">Communications</span>
-                  <span class="assistant__desc">Help with communications</span>
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="pagehead__actions">
-          <button class="textbtn page-header__reorder" type="button" hidden>
-            <span class="material-symbols-outlined">swap_vert</span>Re-order
-          </button>
-          <button class="textbtn page-header__addwidgets" type="button" hidden>
-            <span class="material-symbols-outlined">add</span>Add widgets
-          </button>
-          <button class="outlinebtn page-header__cancel" type="button" hidden>Cancel</button>
-          <button class="filledbtn page-header__save" type="button" hidden>Save</button>
-          <button class="textbtn textbtn--customise page-header__edit" type="button" aria-pressed="false">
-            <span class="material-symbols-outlined">edit</span>Customise
-          </button>
-        </div>
-      </div>
-
-      <!-- ========================= AI BLOCKS ========================= -->
-      <div class="blocks" id="aiBlocks">
-
-        <!-- Halo Ai Chat promo -->
-        <section class="cell cell--promo" id="chatPromo">
-          <img class="promo__bg" src="assets/promo-bg.png" alt="" />
-          <div class="promo__head">
-            <div class="aicard__headleft">
-              <ai-orb class="promo__avatar" variant="halo"></ai-orb>
-              <p class="promo__title">Halo Ai Chat is coming</p>
-            </div>
-            <button class="iconbtn promo__close" type="button" aria-label="Dismiss">
-              <span class="material-symbols-outlined">close</span>
-            </button>
-          </div>
-          <p class="promo__body">As we’re currently developing our Ai to enable custom prompt-to-response functionality, we/ve enabled pre-made prompts within dashboard widgets to assist on matter management.</p>
-          <div class="promo__art"><img src="assets/ask-halo.png" alt="Ask Halo" /></div>
-        </section>
-
-        <!-- Draft replies to send -->
-        <section class="cell widget aicard" data-widget-id="replies" data-block="replies" data-assistant="communications" data-state="prompt">
-
-          <!-- Step 1 — pre-canned prompts -->
-          <div class="aicard__prompt">
-            <div class="aicard__head aicard__head--plain">
-              <div class="aicard__headleft">
-                <ai-orb class="aicard__avatar" variant="communications"></ai-orb>
-                <p class="aicard__title">Draft replies to send</p>
-              </div>
-            </div>
-            <div class="aicard__promptbody">
-              <p class="aicard__label">Prompt or upload emails for review:</p>
-              <div class="prompts">
-                  <button class="pchip pchip--communications" type="button" data-prompt="0">
-                    <span class="pchip__text">Draft replies to all my unanswered emails from the last 3 days</span>
-                    <span class="pchip__tokens">~1.6k</span>
-                  </button>
-              </div>
-                <button class="upzone" type="button" data-upload>
-                  <img class="upzone__icon" src="assets/icon-upload.svg" alt="" />
-                  <span class="upzone__label">Upload an email or thread</span>
-                </button>
-                <input class="upzone__input" type="file" hidden data-upload-input />
-            </div>
-            <p class="aicard__loadtext">Thinking...</p>
-          </div>
-
-          <!-- Step 2 — stacked result cards -->
-          <div class="aicard__results">
-            <div class="aicard__top">
-              <div class="aicard__head">
-                <div class="aicard__headleft">
-                  <ai-orb class="aicard__avatar" variant="communications"></ai-orb>
-                  <p class="aicard__title">Draft replies to send</p>
-                </div>
-                <p class="aicard__count" data-count>1 of 9</p>
-                <button class="aicard__cycle" type="button" data-cycle aria-haspopup="true" aria-expanded="false" aria-label="Re-run this prompt on a schedule">
-                  <svg class="aicard__cycleglyph" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.53981 17.6079C5.09536 16.9412 3.92175 15.9343 3.01897 14.5871C2.1162 13.2398 1.66481 11.719 1.66481 10.0246C1.66481 9.66344 1.68217 9.30928 1.71689 8.96205C1.75161 8.61483 1.81064 8.27455 1.89397 7.94122L0.93564 8.50372L0.102307 7.06622L4.08147 4.77455L6.37314 8.73289L4.91481 9.56622L3.78981 7.60789C3.63703 7.98289 3.52245 8.37178 3.44606 8.77455C3.36967 9.17733 3.33147 9.594 3.33147 10.0246C3.33147 11.3718 3.69953 12.5975 4.43564 13.7016C5.17175 14.8058 6.15092 15.6218 7.37314 16.1496L6.53981 17.6079ZM12.9148 7.50372V5.83705H15.1856C14.5467 5.04539 13.7759 4.4308 12.8731 3.9933C11.9704 3.5558 11.012 3.33705 9.99814 3.33705C9.23425 3.33705 8.51203 3.45511 7.83147 3.69122C7.15092 3.92733 6.52592 4.26066 5.95647 4.69122L5.12314 3.23289C5.81758 2.74678 6.57453 2.36483 7.39397 2.08705C8.21342 1.80928 9.08147 1.67039 9.99814 1.67039C11.0954 1.67039 12.144 1.87525 13.144 2.28497C14.144 2.69469 15.0398 3.28844 15.8315 4.06622V2.92039H17.4981V7.50372H12.9148ZM12.3731 20.0037L8.39397 17.7121L10.6856 13.7537L12.1231 14.5871L10.9356 16.6287C12.5745 16.3926 13.9391 15.6496 15.0294 14.3996C16.1197 13.1496 16.6648 11.6843 16.6648 10.0037C16.6648 9.85094 16.6613 9.70858 16.6544 9.57664C16.6474 9.44469 16.6301 9.30928 16.6023 9.17039H18.2898C18.3037 9.30928 18.3141 9.44469 18.3211 9.57664C18.328 9.70858 18.3315 9.85094 18.3315 10.0037C18.3315 11.8787 17.7724 13.5558 16.6544 15.035C15.5363 16.5141 14.0815 17.5107 12.2898 18.0246L13.2065 18.5662L12.3731 20.0037Z" fill="currentColor"/></svg>
-                </button>
-              </div>
-              <div class="stack" data-stack></div>
-            </div>
-            <div class="aicard__foot">
-              <button class="textbtn" type="button" data-back>Back</button>
-              <button class="outlinebtn" type="button" data-action="open-replies">Review all</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Find documents -->
-        <section class="cell widget aicard" data-widget-id="documents" data-block="documents" data-assistant="operations" data-state="prompt">
-
-          <!-- Step 1 — pre-canned prompts -->
-          <div class="aicard__prompt">
-            <div class="aicard__head aicard__head--plain">
-              <div class="aicard__headleft">
-                <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
-                <p class="aicard__title">Find documents</p>
-              </div>
-            </div>
-            <div class="aicard__promptbody">
-              <p class="aicard__label">Prompt or upload emails for review:</p>
-              <div class="prompts">
-                  <button class="pchip pchip--operations" type="button" data-prompt="0">
-                    <span class="pchip__text">Find and extract all attachments from unread emails</span>
-                    <span class="pchip__tokens">~1.0k</span>
-                  </button>
-              </div>
-                <button class="upzone" type="button" data-upload>
-                  <img class="upzone__icon" src="assets/icon-upload.svg" alt="" />
-                  <span class="upzone__label">Upload an email or thread</span>
-                </button>
-                <input class="upzone__input" type="file" hidden data-upload-input />
-            </div>
-            <p class="aicard__loadtext">Thinking...</p>
-          </div>
-
-          <!-- Step 2 — stacked result cards -->
-          <div class="aicard__results">
-            <div class="aicard__top">
-              <div class="aicard__head">
-                <div class="aicard__headleft">
-                  <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
-                  <p class="aicard__title">Find documents</p>
-                </div>
-                <p class="aicard__count" data-count>1 of 6</p>
-                <button class="aicard__cycle" type="button" data-cycle aria-haspopup="true" aria-expanded="false" aria-label="Re-run this prompt on a schedule">
-                  <svg class="aicard__cycleglyph" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.53981 17.6079C5.09536 16.9412 3.92175 15.9343 3.01897 14.5871C2.1162 13.2398 1.66481 11.719 1.66481 10.0246C1.66481 9.66344 1.68217 9.30928 1.71689 8.96205C1.75161 8.61483 1.81064 8.27455 1.89397 7.94122L0.93564 8.50372L0.102307 7.06622L4.08147 4.77455L6.37314 8.73289L4.91481 9.56622L3.78981 7.60789C3.63703 7.98289 3.52245 8.37178 3.44606 8.77455C3.36967 9.17733 3.33147 9.594 3.33147 10.0246C3.33147 11.3718 3.69953 12.5975 4.43564 13.7016C5.17175 14.8058 6.15092 15.6218 7.37314 16.1496L6.53981 17.6079ZM12.9148 7.50372V5.83705H15.1856C14.5467 5.04539 13.7759 4.4308 12.8731 3.9933C11.9704 3.5558 11.012 3.33705 9.99814 3.33705C9.23425 3.33705 8.51203 3.45511 7.83147 3.69122C7.15092 3.92733 6.52592 4.26066 5.95647 4.69122L5.12314 3.23289C5.81758 2.74678 6.57453 2.36483 7.39397 2.08705C8.21342 1.80928 9.08147 1.67039 9.99814 1.67039C11.0954 1.67039 12.144 1.87525 13.144 2.28497C14.144 2.69469 15.0398 3.28844 15.8315 4.06622V2.92039H17.4981V7.50372H12.9148ZM12.3731 20.0037L8.39397 17.7121L10.6856 13.7537L12.1231 14.5871L10.9356 16.6287C12.5745 16.3926 13.9391 15.6496 15.0294 14.3996C16.1197 13.1496 16.6648 11.6843 16.6648 10.0037C16.6648 9.85094 16.6613 9.70858 16.6544 9.57664C16.6474 9.44469 16.6301 9.30928 16.6023 9.17039H18.2898C18.3037 9.30928 18.3141 9.44469 18.3211 9.57664C18.328 9.70858 18.3315 9.85094 18.3315 10.0037C18.3315 11.8787 17.7724 13.5558 16.6544 15.035C15.5363 16.5141 14.0815 17.5107 12.2898 18.0246L13.2065 18.5662L12.3731 20.0037Z" fill="currentColor"/></svg>
-                </button>
-              </div>
-              <div class="stack" data-stack></div>
-            </div>
-            <div class="aicard__foot">
-              <button class="textbtn" type="button" data-back>Back</button>
-              <button class="outlinebtn" type="button">Review all</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Help with client relations -->
-        <section class="cell widget aicard" data-widget-id="relations" data-block="relations" data-assistant="communications" data-state="prompt">
-
-          <!-- Step 1 — pre-canned prompts -->
-          <div class="aicard__prompt">
-            <div class="aicard__head aicard__head--plain">
-              <div class="aicard__headleft">
-                <ai-orb class="aicard__avatar" variant="communications"></ai-orb>
-                <p class="aicard__title">Help with client relations</p>
-              </div>
-            </div>
-            <div class="aicard__promptbody">
-              <p class="aicard__label">Prompt or upload emails for review:</p>
-              <div class="prompts">
-                  <button class="pchip pchip--communications" type="button" data-prompt="0">
-                    <span class="pchip__text">Draft all messages to clients that are treating me poorly</span>
-                    <span class="pchip__tokens">~1.7k</span>
-                  </button>
-              </div>
-                <button class="upzone" type="button" data-upload>
-                  <img class="upzone__icon" src="assets/icon-upload.svg" alt="" />
-                  <span class="upzone__label">Upload a client message</span>
-                </button>
-                <input class="upzone__input" type="file" hidden data-upload-input />
-            </div>
-            <p class="aicard__loadtext">Thinking...</p>
-          </div>
-
-          <!-- Step 2 — stacked result cards -->
-          <div class="aicard__results">
-            <div class="aicard__top">
-              <div class="aicard__head">
-                <div class="aicard__headleft">
-                  <ai-orb class="aicard__avatar" variant="communications"></ai-orb>
-                  <p class="aicard__title">Help with client relations</p>
-                </div>
-                <p class="aicard__count" data-count>1 of 5</p>
-                <button class="aicard__cycle" type="button" data-cycle aria-haspopup="true" aria-expanded="false" aria-label="Re-run this prompt on a schedule">
-                  <svg class="aicard__cycleglyph" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.53981 17.6079C5.09536 16.9412 3.92175 15.9343 3.01897 14.5871C2.1162 13.2398 1.66481 11.719 1.66481 10.0246C1.66481 9.66344 1.68217 9.30928 1.71689 8.96205C1.75161 8.61483 1.81064 8.27455 1.89397 7.94122L0.93564 8.50372L0.102307 7.06622L4.08147 4.77455L6.37314 8.73289L4.91481 9.56622L3.78981 7.60789C3.63703 7.98289 3.52245 8.37178 3.44606 8.77455C3.36967 9.17733 3.33147 9.594 3.33147 10.0246C3.33147 11.3718 3.69953 12.5975 4.43564 13.7016C5.17175 14.8058 6.15092 15.6218 7.37314 16.1496L6.53981 17.6079ZM12.9148 7.50372V5.83705H15.1856C14.5467 5.04539 13.7759 4.4308 12.8731 3.9933C11.9704 3.5558 11.012 3.33705 9.99814 3.33705C9.23425 3.33705 8.51203 3.45511 7.83147 3.69122C7.15092 3.92733 6.52592 4.26066 5.95647 4.69122L5.12314 3.23289C5.81758 2.74678 6.57453 2.36483 7.39397 2.08705C8.21342 1.80928 9.08147 1.67039 9.99814 1.67039C11.0954 1.67039 12.144 1.87525 13.144 2.28497C14.144 2.69469 15.0398 3.28844 15.8315 4.06622V2.92039H17.4981V7.50372H12.9148ZM12.3731 20.0037L8.39397 17.7121L10.6856 13.7537L12.1231 14.5871L10.9356 16.6287C12.5745 16.3926 13.9391 15.6496 15.0294 14.3996C16.1197 13.1496 16.6648 11.6843 16.6648 10.0037C16.6648 9.85094 16.6613 9.70858 16.6544 9.57664C16.6474 9.44469 16.6301 9.30928 16.6023 9.17039H18.2898C18.3037 9.30928 18.3141 9.44469 18.3211 9.57664C18.328 9.70858 18.3315 9.85094 18.3315 10.0037C18.3315 11.8787 17.7724 13.5558 16.6544 15.035C15.5363 16.5141 14.0815 17.5107 12.2898 18.0246L13.2065 18.5662L12.3731 20.0037Z" fill="currentColor"/></svg>
-                </button>
-              </div>
-              <div class="stack" data-stack></div>
-            </div>
-            <div class="aicard__foot">
-              <button class="textbtn" type="button" data-back>Back</button>
-              <button class="outlinebtn" type="button" data-action="open-relations">Review all</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Searches to follow-up -->
-        <section class="cell widget aicard" data-widget-id="searches" data-block="searches" data-assistant="operations communications" data-state="prompt">
-
-          <!-- Step 1 — pre-canned prompts -->
-          <div class="aicard__prompt">
-            <div class="aicard__head aicard__head--plain">
-              <div class="aicard__headleft">
-                <span class="aicard__avatars">
-            <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
-            <ai-orb class="aicard__avatar" variant="communications"></ai-orb>
-          </span>
-                <p class="aicard__title">Searches to follow-up</p>
-              </div>
-            </div>
-            <div class="aicard__promptbody">
-              <p class="aicard__label">Prompt to run an analysis or draft messages:</p>
-              <div class="prompts prompts--sm">
-                  <button class="pchip pchip--operations" type="button" data-prompt="0">
-                    <span class="pchip__text">Follow-up expired and expiring searches</span>
-                    <span class="pchip__tokens">~1.0k</span>
-                  </button>
-                  <button class="pchip pchip--communications" type="button" data-prompt="1">
-                    <span class="pchip__text">Draft follow-up messages for searches that contain anomalies</span>
-                    <span class="pchip__tokens">~1.3k</span>
-                  </button>
-                  <button class="pchip pchip--operations" type="button" data-prompt="2">
-                    <span class="pchip__text">Follow-up AP1 ready searches</span>
-                    <span class="pchip__tokens">~1.0k</span>
-                  </button>
-              </div>
-            </div>
-            <p class="aicard__loadtext">Thinking...</p>
-          </div>
-
-          <!-- Step 2 — stacked result cards -->
-          <div class="aicard__results">
-            <div class="aicard__top">
-              <div class="aicard__head">
-                <div class="aicard__headleft">
-                  <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
-                  <p class="aicard__title">Searches to follow-up</p>
-                </div>
-                <p class="aicard__count" data-count>1 of 6</p>
-                <button class="aicard__cycle" type="button" data-cycle aria-haspopup="true" aria-expanded="false" aria-label="Re-run this prompt on a schedule">
-                  <svg class="aicard__cycleglyph" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.53981 17.6079C5.09536 16.9412 3.92175 15.9343 3.01897 14.5871C2.1162 13.2398 1.66481 11.719 1.66481 10.0246C1.66481 9.66344 1.68217 9.30928 1.71689 8.96205C1.75161 8.61483 1.81064 8.27455 1.89397 7.94122L0.93564 8.50372L0.102307 7.06622L4.08147 4.77455L6.37314 8.73289L4.91481 9.56622L3.78981 7.60789C3.63703 7.98289 3.52245 8.37178 3.44606 8.77455C3.36967 9.17733 3.33147 9.594 3.33147 10.0246C3.33147 11.3718 3.69953 12.5975 4.43564 13.7016C5.17175 14.8058 6.15092 15.6218 7.37314 16.1496L6.53981 17.6079ZM12.9148 7.50372V5.83705H15.1856C14.5467 5.04539 13.7759 4.4308 12.8731 3.9933C11.9704 3.5558 11.012 3.33705 9.99814 3.33705C9.23425 3.33705 8.51203 3.45511 7.83147 3.69122C7.15092 3.92733 6.52592 4.26066 5.95647 4.69122L5.12314 3.23289C5.81758 2.74678 6.57453 2.36483 7.39397 2.08705C8.21342 1.80928 9.08147 1.67039 9.99814 1.67039C11.0954 1.67039 12.144 1.87525 13.144 2.28497C14.144 2.69469 15.0398 3.28844 15.8315 4.06622V2.92039H17.4981V7.50372H12.9148ZM12.3731 20.0037L8.39397 17.7121L10.6856 13.7537L12.1231 14.5871L10.9356 16.6287C12.5745 16.3926 13.9391 15.6496 15.0294 14.3996C16.1197 13.1496 16.6648 11.6843 16.6648 10.0037C16.6648 9.85094 16.6613 9.70858 16.6544 9.57664C16.6474 9.44469 16.6301 9.30928 16.6023 9.17039H18.2898C18.3037 9.30928 18.3141 9.44469 18.3211 9.57664C18.328 9.70858 18.3315 9.85094 18.3315 10.0037C18.3315 11.8787 17.7724 13.5558 16.6544 15.035C15.5363 16.5141 14.0815 17.5107 12.2898 18.0246L13.2065 18.5662L12.3731 20.0037Z" fill="currentColor"/></svg>
-                </button>
-              </div>
-              <div class="stack" data-stack></div>
-            </div>
-            <div class="aicard__foot">
-              <button class="textbtn" type="button" data-back>Back</button>
-              <button class="outlinebtn" type="button" data-action="open-searches">Review all</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Matters to follow-up -->
-        <section class="cell widget aicard" data-widget-id="matters" data-block="matters" data-assistant="operations" data-state="prompt">
-
-          <!-- Step 1 — pre-canned prompts -->
-          <div class="aicard__prompt">
-            <div class="aicard__head aicard__head--plain">
-              <div class="aicard__headleft">
-                <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
-                <p class="aicard__title">Matters to follow-up</p>
-              </div>
-            </div>
-            <div class="aicard__promptbody">
-              <p class="aicard__label">Prompt to run an analysis:</p>
-              <div class="prompts prompts--sm">
-                  <button class="pchip pchip--operations" type="button" data-prompt="0">
-                    <span class="pchip__text">List all matters ready to close</span>
-                    <span class="pchip__tokens">~1.1k</span>
-                  </button>
-                  <button class="pchip pchip--operations" type="button" data-prompt="1">
-                    <span class="pchip__text">Flag matters with a remaining balance</span>
-                    <span class="pchip__tokens">~0.9k</span>
-                  </button>
-              </div>
-            </div>
-            <p class="aicard__loadtext">Thinking...</p>
-          </div>
-
-          <!-- Step 2 — stacked result cards -->
-          <div class="aicard__results">
-            <div class="aicard__top">
-              <div class="aicard__head">
-                <div class="aicard__headleft">
-                  <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
-                  <p class="aicard__title">Matters to follow-up</p>
-                </div>
-                <p class="aicard__count" data-count>1 of 7</p>
-                <button class="aicard__cycle" type="button" data-cycle aria-haspopup="true" aria-expanded="false" aria-label="Re-run this prompt on a schedule">
-                  <svg class="aicard__cycleglyph" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.53981 17.6079C5.09536 16.9412 3.92175 15.9343 3.01897 14.5871C2.1162 13.2398 1.66481 11.719 1.66481 10.0246C1.66481 9.66344 1.68217 9.30928 1.71689 8.96205C1.75161 8.61483 1.81064 8.27455 1.89397 7.94122L0.93564 8.50372L0.102307 7.06622L4.08147 4.77455L6.37314 8.73289L4.91481 9.56622L3.78981 7.60789C3.63703 7.98289 3.52245 8.37178 3.44606 8.77455C3.36967 9.17733 3.33147 9.594 3.33147 10.0246C3.33147 11.3718 3.69953 12.5975 4.43564 13.7016C5.17175 14.8058 6.15092 15.6218 7.37314 16.1496L6.53981 17.6079ZM12.9148 7.50372V5.83705H15.1856C14.5467 5.04539 13.7759 4.4308 12.8731 3.9933C11.9704 3.5558 11.012 3.33705 9.99814 3.33705C9.23425 3.33705 8.51203 3.45511 7.83147 3.69122C7.15092 3.92733 6.52592 4.26066 5.95647 4.69122L5.12314 3.23289C5.81758 2.74678 6.57453 2.36483 7.39397 2.08705C8.21342 1.80928 9.08147 1.67039 9.99814 1.67039C11.0954 1.67039 12.144 1.87525 13.144 2.28497C14.144 2.69469 15.0398 3.28844 15.8315 4.06622V2.92039H17.4981V7.50372H12.9148ZM12.3731 20.0037L8.39397 17.7121L10.6856 13.7537L12.1231 14.5871L10.9356 16.6287C12.5745 16.3926 13.9391 15.6496 15.0294 14.3996C16.1197 13.1496 16.6648 11.6843 16.6648 10.0037C16.6648 9.85094 16.6613 9.70858 16.6544 9.57664C16.6474 9.44469 16.6301 9.30928 16.6023 9.17039H18.2898C18.3037 9.30928 18.3141 9.44469 18.3211 9.57664C18.328 9.70858 18.3315 9.85094 18.3315 10.0037C18.3315 11.8787 17.7724 13.5558 16.6544 15.035C15.5363 16.5141 14.0815 17.5107 12.2898 18.0246L13.2065 18.5662L12.3731 20.0037Z" fill="currentColor"/></svg>
-                </button>
-              </div>
-              <div class="stack" data-stack></div>
-            </div>
-            <div class="aicard__foot">
-              <button class="textbtn" type="button" data-back>Back</button>
-              <button class="outlinebtn" type="button" data-action="open-matters">Review all</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- AML Checks -->
-        <section class="cell widget aicard" data-widget-id="aml" data-block="aml" data-assistant="operations finance" data-state="prompt">
-
-          <!-- Step 1 — pre-canned prompts -->
-          <div class="aicard__prompt">
-            <div class="aicard__head aicard__head--plain">
-              <div class="aicard__headleft">
-                <span class="aicard__avatars">
-            <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
-            <ai-orb class="aicard__avatar" variant="finance"></ai-orb>
-          </span>
-                <p class="aicard__title">AML Checks</p>
-              </div>
-            </div>
-            <div class="aicard__promptbody">
-              <p class="aicard__label">Prompt to run an analysis:</p>
-              <div class="prompts prompts--sm">
-                  <button class="pchip pchip--operations" type="button" data-prompt="0">
-                    <span class="pchip__text">Which AML checks are outstanding?</span>
-                    <span class="pchip__tokens">~0.8k</span>
-                  </button>
-                  <button class="pchip pchip--finance" type="button" data-prompt="1">
-                    <span class="pchip__text">Show me who still requires proof of source-of-funds to be checked</span>
-                    <span class="pchip__tokens">~2.1k</span>
-                  </button>
-              </div>
-            </div>
-            <p class="aicard__loadtext">Thinking...</p>
-          </div>
-
-          <!-- Step 2 — stacked result cards -->
-          <div class="aicard__results">
-            <div class="aicard__top">
-              <div class="aicard__head">
-                <div class="aicard__headleft">
-                  <ai-orb class="aicard__avatar" variant="operations"></ai-orb>
-                  <p class="aicard__title">AML Checks</p>
-                </div>
-                <p class="aicard__count" data-count>1 of 6</p>
-                <button class="aicard__cycle" type="button" data-cycle aria-haspopup="true" aria-expanded="false" aria-label="Re-run this prompt on a schedule">
-                  <svg class="aicard__cycleglyph" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.53981 17.6079C5.09536 16.9412 3.92175 15.9343 3.01897 14.5871C2.1162 13.2398 1.66481 11.719 1.66481 10.0246C1.66481 9.66344 1.68217 9.30928 1.71689 8.96205C1.75161 8.61483 1.81064 8.27455 1.89397 7.94122L0.93564 8.50372L0.102307 7.06622L4.08147 4.77455L6.37314 8.73289L4.91481 9.56622L3.78981 7.60789C3.63703 7.98289 3.52245 8.37178 3.44606 8.77455C3.36967 9.17733 3.33147 9.594 3.33147 10.0246C3.33147 11.3718 3.69953 12.5975 4.43564 13.7016C5.17175 14.8058 6.15092 15.6218 7.37314 16.1496L6.53981 17.6079ZM12.9148 7.50372V5.83705H15.1856C14.5467 5.04539 13.7759 4.4308 12.8731 3.9933C11.9704 3.5558 11.012 3.33705 9.99814 3.33705C9.23425 3.33705 8.51203 3.45511 7.83147 3.69122C7.15092 3.92733 6.52592 4.26066 5.95647 4.69122L5.12314 3.23289C5.81758 2.74678 6.57453 2.36483 7.39397 2.08705C8.21342 1.80928 9.08147 1.67039 9.99814 1.67039C11.0954 1.67039 12.144 1.87525 13.144 2.28497C14.144 2.69469 15.0398 3.28844 15.8315 4.06622V2.92039H17.4981V7.50372H12.9148ZM12.3731 20.0037L8.39397 17.7121L10.6856 13.7537L12.1231 14.5871L10.9356 16.6287C12.5745 16.3926 13.9391 15.6496 15.0294 14.3996C16.1197 13.1496 16.6648 11.6843 16.6648 10.0037C16.6648 9.85094 16.6613 9.70858 16.6544 9.57664C16.6474 9.44469 16.6301 9.30928 16.6023 9.17039H18.2898C18.3037 9.30928 18.3141 9.44469 18.3211 9.57664C18.328 9.70858 18.3315 9.85094 18.3315 10.0037C18.3315 11.8787 17.7724 13.5558 16.6544 15.035C15.5363 16.5141 14.0815 17.5107 12.2898 18.0246L13.2065 18.5662L12.3731 20.0037Z" fill="currentColor"/></svg>
-                </button>
-              </div>
-              <div class="stack" data-stack></div>
-            </div>
-            <div class="aicard__foot">
-              <button class="textbtn" type="button" data-back>Back</button>
-              <button class="outlinebtn" type="button" data-action="open-aml">Review all</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Bills & payments -->
-        <section class="cell widget cell--chart" data-widget-id="cashflow">
-          <div class="cellhead"><p class="cellhead__title">Bills &amp; payments</p></div>
-          <div class="chart">
-            <div class="chart__legend">
-              <span class="legend"><i class="legend__dot legend__dot--bills"></i>Bills</span>
-              <span class="legend"><i class="legend__dot legend__dot--pay"></i>Payments</span>
-            </div>
-            <div class="chart__plot">
-              <div class="chart__axis">
-                <span style="top:0">£30k</span>
-                <span style="top:33px">£20k</span>
-                <span style="top:67px">£10k</span>
-                <span style="top:104px">£0</span>
-              </div>
-              <div class="chart__grid">
-                <i style="top:0"></i><i style="top:33px"></i><i style="top:67px"></i><i style="top:104px"></i>
-              </div>
-              <div class="chart__bars" id="chartBarsNew"></div>
-            </div>
-            <div class="chart__figures">
-              <div class="figure"><span class="figure__label">Bills</span><span class="figure__value">£120,613</span></div>
-              <div class="figure"><span class="figure__label">Payments</span><span class="figure__value">£78,207</span></div>
-              <div class="figure"><span class="figure__label">Balance</span><span class="figure__value figure__value--neg">-£42,594</span></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- PAF Deadline -->
-        <section class="cell widget cell--paf" data-widget-id="paf">
-          <div class="cellhead"><p class="cellhead__title">PAF Deadline</p></div>
-          <img class="paf__ring" src="assets/paf-ring.svg" alt="" />
-          <div class="paf__readout">
-            <p class="paf__time" id="pafTimerNew"><b>01:50</b><i>:56</i></p>
-            <p class="paf__caption">3pm weekdays</p>
-          </div>
-        </section>
-
-        <!-- Upcoming activities -->
-        <section class="cell widget cell--note" data-widget-id="activities">
-          <div class="cellhead cellhead--tight"><p class="cellhead__title">Upcoming activities</p></div>
-          <p class="cellnote">There are currently no upcoming activities</p>
-        </section>
-
-        <!-- Recent PAFs -->
-        <section class="cell widget cell--note" data-widget-id="recent-pafs">
-          <div class="cellhead"><p class="cellhead__title">Recent PAFs</p></div>
-          <p class="cellnote">This block is too small to preview Recent PAFs please increase the size of the block to continue</p>
-        </section>
-
-        <!-- Time recordings -->
-        <section class="cell widget cell--note" data-widget-id="time-recordings">
-          <div class="cellhead"><p class="cellhead__title">Time recordings</p></div>
-          <p class="cellnote">This block is too small to preview Time recordings please increase the size of the block to continue</p>
-        </section>
-
-        <!-- Empty slot -->
-        <section class="cell cell--empty"></section>
-
-      </div>
+    <!-- ===== The workspace bed ======================================= -->
+    <main class="workspace" id="workspace">
+      <div class="columns" id="columns"></div>
+      <div id="hero"></div>
     </main>
-  </div>
 
-  <!-- ===================== WIDGET LIBRARY DRAWER ===================== -->
-  <div class="library__scrim" id="libraryScrim" hidden></div>
-  <aside class="library" id="library" aria-label="Widget library" aria-hidden="true">
-    <header class="library__head">
-      <h2 class="library__title">Widget library</h2>
-      <button class="library__close" id="libraryClose" aria-label="Close widget library">
-        <span class="material-symbols-outlined">close</span>
-      </button>
-    </header>
-    <p class="library__intro">Add or remove widgets from your dashboard.</p>
+    <div id="toolbar-slot"></div>
 
-    <section class="library__section">
-      <h3 class="library__subtitle">On dashboard</h3>
-      <ul class="library__list" id="libraryActive"></ul>
-    </section>
-    <section class="library__section">
-      <h3 class="library__subtitle">Removed</h3>
-      <ul class="library__list" id="libraryRemoved"></ul>
-    </section>
-  </aside>
+    <!-- ===== Ask Halo ================================================ -->
+    <div id="ask-slot"></div>
+    <!-- The orb lives in the markup rather than being rendered, so the button
+         keeps one WebGL context for the life of the page. Its `background`
+         matches the frosted blue pill so no corner of the canvas shows. -->
+    <button class="fab" id="ask-fab" hidden>
+      <ai-orb class="orb" style="width:32px;height:32px" diameter="1" state="idle"
+              background="#c6e8fe" gain="3.4" bloom="0" ink-level="1"
+              time-offset="3.5"></ai-orb>
+      Ask Halo
+    </button>
 
-  <!-- ===================== RE-ORDER PANEL ===================== -->
-  <div class="reorder__scrim" id="reorderScrim" hidden></div>
-  <aside class="reorder" id="reorder" aria-label="Re-order layout" aria-hidden="true">
-    <header class="reorder__head">
-      <h2 class="reorder__title">Re-order layout</h2>
-      <button class="reorder__close" id="reorderClose" aria-label="Close re-order panel">
-        <span class="material-symbols-outlined">close</span>
-      </button>
-    </header>
-    <p class="reorder__intro">Drag blocks (or use the arrows) to change their order, and set how many columns each row has. Click Save to re-organise the grid.</p>
+  </div><!-- /.main -->
+</div><!-- /.app -->
 
-    <section class="reorder__section reorder__section--wire">
-      <h3 class="reorder__subtitle">Layout preview</h3>
-      <div class="reorder__wire" id="reorderWire"></div>
-    </section>
-    <section class="reorder__section reorder__section--list">
-      <h3 class="reorder__subtitle">Block order</h3>
-      <ul class="reorder__list" id="reorderList"></ul>
-    </section>
-
-    <div class="reorder__actions">
-      <button class="reorder__cancel" id="reorderCancel" type="button">Cancel</button>
-      <button class="reorder__save" id="reorderSave" type="button">Save</button>
-    </div>
-  </aside>
-
-
-  <!-- ===================== DRAFT REPLY MODAL ===================== -->
-  <div class="modal-scrim modal-scrim--reply" id="replyScrim" hidden>
-    <div class="modal modal--reply" role="dialog" aria-modal="true" aria-labelledby="replyTitle">
-      <header class="modal__head">
-        <h2 class="modal__title" id="replyTitle">Draft reply</h2>
-        <button class="modal__close" id="replyClose" type="button" aria-label="Close">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </header>
-      <div class="modal__body" id="replyBody"></div>
-      <footer class="modal__foot">
-        <div class="rate">
-          <span class="rate__icons">
-            <button class="rate__btn" type="button" aria-label="Rate down"><span class="material-symbols-outlined">thumb_down</span></button>
-            <button class="rate__btn" type="button" aria-label="Rate up"><span class="material-symbols-outlined">thumb_up</span></button>
-          </span>
-          <span class="rate__text">How accurate was this?<br>Rate our assessment, improve the Ai</span>
-        </div>
-        <div class="modal__actions">
-          <button class="btn-outline" id="replyCancel" type="button">Close</button>
-          <button class="btn-filled" id="replySend" type="button">Send reply</button>
-        </div>
-      </footer>
+<!-- ===== Search overlay (Figma 5570:491832) ========================== -->
+<div class="scrim" id="search-scrim" hidden>
+  <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search Halo">
+    <div class="search-panel__wrapper">
+      <div class="search-field">
+        <span class="search-field__leading">
+          <button class="icon-btn" id="search-back" aria-label="Close search">
+            <span><img src="assets/icon-back.svg" alt=""></span>
+          </button>
+        </span>
+        <input id="search-input" type="search" autocomplete="off" spellcheck="false"
+               placeholder="Search matters, clients, references, addresses…"
+               aria-controls="search-results" aria-autocomplete="list">
+        <span class="search-field__trailing">
+          <button class="icon-btn" id="search-clear" aria-label="Clear search">
+            <span><img src="assets/icon-close.svg" alt=""></span>
+          </button>
+        </span>
+      </div>
+      <div class="search-tabs">
+        <div class="search-tabs__tab" id="search-tab">Recent Matters</div>
+      </div>
+      <div class="search-results" id="search-results" role="listbox" aria-label="Matters"></div>
     </div>
   </div>
+</div>
 
-  <script src="assets/ai-orb.js"></script>
-  <script src="script.js"></script>
-  <script src="dashboard.js"></script>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="data.js"></script>
+<script src="orb.js"></script>
+<script src="workload.js"></script>
+<script src="search.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
